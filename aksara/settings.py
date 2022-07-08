@@ -14,6 +14,8 @@ import os
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 import environ
+from urllib.parse import urlparse
+import dj_database_url
 import mimetypes
 
 mimetypes.add_type("text/css", ".css", True)
@@ -91,17 +93,42 @@ WSGI_APPLICATION = 'aksara.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    "default" : {
-        "ENGINE" : "django.db.backends.postgresql",
-        "NAME" : os.getenv("POSTGRES_DB"),
-        "USER" : os.getenv("POSTGRES_USER"),
-        "PASSWORD" : os.getenv("POSTGRES_PASSWORD"),
-        "HOST" : os.getenv("POSTGRESS_HOST"),
-        "PORT" : os.getenv("POSTGRES_PORT"),
-        "OPTIONS" : {"sslmode" : "require"}        
+# DATABASES = {
+#     "default" : {
+#         "ENGINE" : "django.db.backends.postgresql_psycopg2",
+#         "NAME" : os.getenv("POSTGRES_DB"),
+#         "USER" : os.getenv("POSTGRES_USER"),
+#         "PASSWORD" : os.getenv("POSTGRES_PASSWORD"),
+#         "HOST" : os.getenv("POSTGRESS_HOST"),
+#         "PORT" : os.getenv("POSTGRES_PORT"),
+#         "OPTIONS" : {"sslmode" : os.getenv("POSTGRES_SSL")}        
+#     }
+# }
+
+if os.getenv("DATABASE_URL", "") != "" :
+    r = urlparse(os.environ.get("DATABASE_URL"))
+    DATABASES = {
+        "default" : {
+            "ENGINE" : "django.db.backends.postgresql_psycopg2",
+            "NAME" : os.path.relpath(r.path, "/"),
+            "USER" : r.username,
+            "PASSWORD" : r.password,
+            "HOST" : r.hostname,
+            "PORT" : r.port,
+            "OPTIONS" : {"sslmode" : "require"}
+        }
     }
-}
+else :
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv("POSTGRES_DB"),
+            'USER': os.getenv("POSTGRES_USER"),
+            'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
+            'HOST': os.getenv("POSTGRES_HOST"),
+            'PORT': os.getenv("POSTGRES_PORT")
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
