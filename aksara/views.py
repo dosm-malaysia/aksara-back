@@ -43,6 +43,43 @@ class Dashboard(APIView) :
         else :
             return JsonResponse([], safe=False)
 
+class Helper(APIView) : 
+    def get(self, request, format=None):
+        # Map and get all the parameters that exist in the URL
+        param_list = dict(request.GET) 
+        # Check if the parameters required for this API exists
+        params_req = ["dashboard","helper-type"]
+        if all (p in param_list for p in params_req) :
+            dashboard_name = param_list['dashboard'][0]
+            helper_type = param_list['helper-type'][0]
+            location = param_list['location'][0]
+            data = ''
+            r_data = []
+            if helper_type == "dropdown" : 
+                filter = param_list['filter'][0]
+                with_state = param_list['with_state'][0] if 'with_state' in param_list else False
+                data = json.loads(areas.DROPDOWN_JSON)
+                
+                if with_state : # For Jitter
+                    area_type = json.loads(areas.AREAS_JSON)
+                    for x in data :
+                        if filter in data[x]:
+                            if with_state :
+                                for d in data[x][filter]:
+                                    d.update((k, v + ", " + x.upper()) for k, v in d.items() if k == "label")                    
+                                r_data += sorted(data[x][filter], key=lambda d: d['label']) if with_state else data[x][filter]                    
+                else : 
+                    r_data = data[location][filter]
+            elif helper_type == "area-type" :
+                data = json.loads(areas.AREAS_JSON)
+                r_data = data[location]
+
+            if data != '' and location in data : 
+                return JsonResponse(r_data, safe=False)
+        else : 
+            return JsonResponse([], safe=False)
+
+
 class Temporary(APIView) :
     def get(self, request, format=None):
         # Map and get all the parameters that exist in the URL
