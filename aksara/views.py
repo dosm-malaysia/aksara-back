@@ -72,13 +72,11 @@ class Helper(APIView) :
                     r_data = data[location][filter]
             elif helper_type == "area-type" :
                 data = json.loads(areas.AREAS_JSON)
-                r_data = data[location]
-
+                r_data = {"area-type" : data[location], "area-name" : original_name(location)}
             if data != '' and location in data : 
                 return JsonResponse(r_data, safe=False)
         else : 
             return JsonResponse([], safe=False)
-
 
 class Temporary(APIView) :
     def get(self, request, format=None):
@@ -91,4 +89,37 @@ class Temporary(APIView) :
             #TODO : Check if the dashboard name exists in the db
             return JsonResponse({}, safe=False)
         else :
-            return JsonResponse([], safe=False)            
+            return JsonResponse([], safe=False)
+
+def original_name(area) :
+    STATE_ABBR = {'jhr' : 'Johor',
+                    'kdh' : 'Kedah',
+                    'ktn' : 'Kelantan', 
+                    'kvy' : 'Klang Valley',
+                    'mlk' : 'Melaka',
+                    'nsn' : 'Negeri Sembilan',
+                    'phg' : 'Pahang',
+                    'prk' : 'Perak',
+                    'pls' : 'Perlis',
+                    'png' : 'Pulau Pinang',
+                    'sbh' : 'Sabah',
+                    'swk' : 'Sarawak',
+                    'sgr' : 'Selangor',
+                    'trg' : 'Terengganu',
+                    'lbn' : 'W.P. Labuan',
+                    'pjy' : 'W.P. Putrajaya',
+                    'kul' : 'W.P. Kuala Lumpur',
+                    'mys' :'Malaysia'}
+
+    if area in STATE_ABBR :
+        return STATE_ABBR[area]
+    else :
+        HARD_CODED_AREAS = {
+            'p.018-kulim-bandar-baharu' : 'P.018 Kulim-Bandar Baharu', 
+            'n.27-layang-layang': 'N.27 Layang-Layang', 
+            'n.20-api-api' : 'N.20 Api-Api', 
+            'n.50-gum-gum' : 'N.50 Gum-Gum'}
+        if area in HARD_CODED_AREAS :
+            return HARD_CODED_AREAS[area]
+        else :
+            return area.replace("-", " ").title()
