@@ -1,4 +1,4 @@
 from django.contrib import admin
-# import models here
+from .models import MetaJson
 
-# register models here
+admin.site.register(MetaJson)
