@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.cache import cache
 
-from .serializers import MetaSerializer
-from .models import MetaJson
+from .serializers import MetaSerializer, KKMSerializer
+from .models import MetaJson, KKMNowJSON
 
 from aksara.temp import areas, choropleth, geo, jitter, snapshot
 from aksara.json_helpers import formatter
@@ -132,6 +132,35 @@ class Test(APIView) :
             return JsonResponse(r_val, safe=False)
         else :
             return JsonResponse({}, safe=False)
+
+class KKMNOW(APIView) :
+    def get(self, request, format=None):
+        param_list = dict(request.GET)
+        params_req = ['dashboard']
+        
+        if all (p in param_list for p in params_req) :
+            res = covidvax(param_list)
+            return JsonResponse(res, safe=False)
+        else :
+            return JsonResponse({}, safe=False)
+
+
+def covidvax(param_list) :
+    res = {}
+    params_req = ['state']
+    
+    if all (p in param_list for p in params_req) :
+        dbd_name = param_list['dashboard'][0]
+        state = param_list['state'][0]
+        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
+    
+        for i in info:
+            if i['chart_name'] == 'snapshot_chart' :
+                res[ i['chart_name'] ] = i['chart_data']
+            else :
+                res[ i['chart_name'] ] = i['chart_data'][state]
+                
+    return res
 
 def slice_json_by_params(chart_params, url_params, data) :
     r_data = data
