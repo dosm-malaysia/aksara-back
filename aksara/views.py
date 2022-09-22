@@ -175,7 +175,8 @@ def blood_donation(param_list) :
         info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
 
         for i in info:
-            if i['chart_name'] in ['timeseries_facility', 'heatmap_bloodstock'] :
+            print(i['chart_name'])
+            if i['chart_name'] in ['timeseries_facility', 'heatmap_bloodstock', 'map_facility'] :
                 res[ i['chart_name'] ] = i['chart_data']
             else :
                 res[ i['chart_name'] ] = i['chart_data'][state]
