@@ -140,13 +140,54 @@ class KKMNOW(APIView) :
         
         if all (p in param_list for p in params_req) :
             res = {}
+
+            '''
+            If/else below is temporary, usinf now only to work development faster.
+            Remove if/elif and create general function once all API's are up.
+            '''
+
             if param_list['dashboard'][0] == 'blood_donation' :
                 res = blood_donation(param_list)
             elif param_list['dashboard'][0] == 'covidvax' :
                 res = covidvax(param_list)
+            elif param_list['dashboard'][0] == 'covid_epid' :
+                res = covid_epid(param_list)
+            elif param_list['dashboard'][0] == 'covid_now' :
+                res = covid_now(param_list)
+            
             return JsonResponse(res, safe=False)
         else :
             return JsonResponse({}, safe=False)
+
+def covid_now(param_list) :
+    res = {}
+    params_req = []
+    
+    if all (p in param_list for p in params_req) :
+        dbd_name = param_list['dashboard'][0]
+        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
+
+        for i in info:
+            res[ i['chart_name'] ] = i['chart_data']
+
+    return res 
+
+def covid_epid(param_list) :
+    res = {}
+    params_req = ['state']
+    
+    if all (p in param_list for p in params_req) :
+        dbd_name = param_list['dashboard'][0]
+        state = param_list['state'][0]
+        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
+
+        for i in info:
+            if i['chart_name'] in ['snapshot_table', 'snapshot_bar', 'bar_chart'] :
+                res[ i['chart_name'] ] = i['chart_data']
+            else :
+                res[ i['chart_name'] ] = i['chart_data'][state]
+
+    return res    
 
 def covidvax(param_list) :
     res = {}
