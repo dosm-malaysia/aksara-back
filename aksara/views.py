@@ -154,10 +154,25 @@ class KKMNOW(APIView) :
                 res = covid_epid(param_list)
             elif param_list['dashboard'][0] == 'covid_now' :
                 res = covid_now(param_list)
-            
+            elif param_list['dashboard'][0] == 'facilities' :                
+                res = facilities(param_list)
+
             return JsonResponse(res, safe=False)
         else :
             return JsonResponse({}, safe=False)
+
+def facilities(param_list) :
+    res = {}
+    params_req = []
+    
+    if all (p in param_list for p in params_req) :
+        dbd_name = param_list['dashboard'][0]
+        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
+
+        for i in info:
+            res[ i['chart_name'] ] = i['chart_data']
+
+    return res 
 
 def covid_now(param_list) :
     res = {}
