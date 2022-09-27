@@ -9,129 +9,7 @@ from django.core.cache import cache
 from .serializers import MetaSerializer, KKMSerializer
 from .models import MetaJson, KKMNowJSON
 
-from aksara.temp import areas, choropleth, geo, jitter, snapshot
-from aksara.json_helpers import formatter
-
 import json
-
-class Dashboard(APIView) :
-    def get(self, request, format=None):
-        # Map and get all the parameters that exist in the URL
-        param_list = dict(request.GET) 
-        # Check if the parameters required for this API exists
-        params_req = ["dashboard","location"]
-        if all (p in param_list for p in params_req) :
-            #TODO : Check if the dashboard name exists in the db list of dashboards
-            dashboard_name = param_list['dashboard'][0]
-            l_name = param_list['location'][0]
-            
-            r_val = {}
-            json_charts = {'bar_chart' : snapshot.DOUGHNUT_JSON,
-                           'pyramid_chart' : snapshot.PYRAMID_JSON,
-                           'geo_json' : geo.ALL_GEO_JSON,
-                           'jitter_chart' : jitter.JITTER_JSON}
-
-            area_info = json.loads(areas.AREAS_JSON)
-
-            if l_name in area_info : 
-                area_type = area_info[l_name]
-                for c_type, c_json in json_charts.items() : 
-                    c_info = json.loads(c_json)
-                    if c_type == 'jitter_chart' : 
-                        area_type = 'state' if area_type == 'country' else area_type
-                        r_val[c_type] = c_info[area_type]
-                    elif l_name in c_info :
-                        r_val[c_type] = c_info[l_name]
-
-            return JsonResponse(r_val, safe=False)
-        else :
-            return JsonResponse([], safe=False)
-
-class Helper(APIView) : 
-    def get(self, request, format=None):
-        # Map and get all the parameters that exist in the URL
-        param_list = dict(request.GET) 
-        # Check if the parameters required for this API exists
-        params_req = ["dashboard","helper-type"]
-        if all (p in param_list for p in params_req) :
-            dashboard_name = param_list['dashboard'][0]
-            helper_type = param_list['helper-type'][0]
-            location = param_list['location'][0]
-            data = ''
-            r_data = []
-            if helper_type == "dropdown" : 
-                filter = param_list['filter'][0]
-                with_state = param_list['with_state'][0] if 'with_state' in param_list else False
-                data = json.loads(areas.DROPDOWN_JSON)
-                
-                if with_state : # For Jitter
-                    area_type = json.loads(areas.AREAS_JSON)
-                    temp = {location : data[location]}
-                    temp.update(data)
-                    for x in temp :
-                        if filter in temp[x]:
-                            if with_state :
-                                for d in temp[x][filter]:
-                                    d.update((k, v + ", " + x.upper()) for k, v in d.items() if k == "label")                    
-                                r_data += sorted(temp[x][filter], key=lambda d: d['label']) if with_state else temp[x][filter]                    
-                else : 
-                    r_data = data[location][filter]
-            elif helper_type == "area-type" :
-                data = json.loads(areas.AREAS_JSON)
-                r_data = {"area-type" : data[location], "area-name" : original_name(location)}
-            if data != '' and location in data : 
-                return JsonResponse(r_data, safe=False)
-        else : 
-            return JsonResponse([], safe=False)
-
-class Test(APIView) :
-    def get(self, request, format=None):
-        param_list = dict(request.GET) # Map and get all the parameters that exist in the URL
-
-        # Check for params: required parameters for dashboard is dashboard, optional is page
-        ''' 
-            Error Handling : 1. Check if dashboard param exists
-                             2. Check if page param exists
-                             3. Check if META json of dashboard exists
-                             4. Check if page exists in META json
-        '''
-        
-        if 'dashboard' in param_list :
-            dashboard_name = param_list['dashboard'][0]   
-            page = default_params('page', param_list, 'main')
-            r_val = {} # Set default return value
-
-            # Fetch META json here
-            dbd_info = MetaJson.objects.get(dashboard_name = dashboard_name + "_meta")
-            dbd_json = MetaSerializer(dbd_info, many=False).data['dashboard_meta']
-
-            page_json = dbd_json['pages'][page] # Retrieve page information here
-            page_params = page_json['params']['required'] # Retrieve required page parameters here
-            
-            if required_params(page_params, param_list) : # Check if all required dashboard params exists
-                dbd_charts = page_json['charts']
-                for i in dbd_charts :
-                    required_chart_params = dbd_charts[i]['parameters']['dashboard']['required']['params']
-                    if set(required_chart_params).issubset(page_params) : # Check if the required params for the charts exist on the current API call
-                        chart_type = dbd_charts[i]['chart_type']
-                        dummy_data = {"mys": {"info": {"test": ["mys", "sgr", "ktn"]}}, "sgr": ["mys", "sgr", "ktn"], "mlk" : "sgr"}
-                        
-                        c_val =  slice_json_by_params(required_chart_params, param_list, dummy_data)
-
-                        if dbd_charts[i]['json_method']['post'] is not None : 
-                            post = getattr(formatter, dbd_charts[i]['json_method']['post']['method'])
-                            method_args = dbd_charts[i]['json_method']['post']['argument']
-                            method_args['data'] = c_val
-                            c_val = post(method_args)
-
-                        if chart_type not in r_val : 
-                            r_val[chart_type] = {}
-
-                        r_val[chart_type][i] = c_val
-
-            return JsonResponse(r_val, safe=False)
-        else :
-            return JsonResponse({}, safe=False)
 
 class KKMNOW(APIView) :
     def get(self, request, format=None):
@@ -142,7 +20,7 @@ class KKMNOW(APIView) :
             res = {}
 
             '''
-            If/else below is temporary, usinf now only to work development faster.
+            If/else below is temporary, using now only to work development faster.
             Remove if/elif and create general function once all API's are up.
             '''
 
@@ -163,14 +41,38 @@ class KKMNOW(APIView) :
 
 def facilities(param_list) :
     res = {}
-    params_req = []
+    params_req = ['fac_type', 'state', 'district']
+    params_opt = ['table']
     
+    # 1. Table returns by default, doesn't return if table is set to False 
+
     if all (p in param_list for p in params_req) :
         dbd_name = param_list['dashboard'][0]
         info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
 
+        fac_type = '' if 'fac_type' not in param_list else param_list['fac_type'][0]
+        district = '' if 'district' not in param_list else param_list['district'][0]
+        state = '' if 'state' not in param_list else param_list['state'][0]
+
+        chart_params = {
+            'locations_mapping' : [state, district, fac_type],
+            'distances_within' : [fac_type, state, district],
+            'distances_between' : [fac_type, 'district']
+        }
+
         for i in info:
-            res[ i['chart_name'] ] = i['chart_data']
+            if i['chart_name'] in [ 'facilities_table', 'helpers' ] :
+                res[ i['chart_name'] ] = i['chart_data']
+            else :
+                if fac_type != '' and state != '' and district != '': # Facilty type is needed
+                    values = chart_params[ i['chart_name'] ]
+                    temp = i['chart_data']
+                    for x in values : 
+                        temp = temp[x]
+                    res[ i['chart_name'] ] = temp
+
+        if 'table' in param_list:
+            res.pop('facilities_table')
 
     return res 
 

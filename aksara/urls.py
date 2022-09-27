@@ -19,8 +19,5 @@ from aksara import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dashboard/', views.Dashboard.as_view(), name='Dashboard'),
-    path('helper/', views.Helper.as_view(), name='Helper'),
-    path('test/', views.Test.as_view(), name='Test'),
     path('kkmnow/', views.KKMNOW.as_view(), name='KKMNOW')
 ]

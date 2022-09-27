@@ -9,4 +9,4 @@ class MetaSerializer(serializers.ModelSerializer) :
 class KKMSerializer(serializers.ModelSerializer) :
     class KKM : 
         model = KKMNowJSON
-        fields = ['dashboard_name', 'chart_name', 'chart_data']        
+        fields = ['dashboard_name', 'chart_name', 'chart_type', 'chart_data']        
