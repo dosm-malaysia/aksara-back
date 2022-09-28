@@ -36,6 +36,9 @@ class KKMNOW(APIView) :
                 res = facilities(param_list)
             elif param_list['dashboard'][0] == 'organ_donation' :
                 res = organ_donation(param_list)
+            elif param_list['dashboard'][0] == 'peka_b40' :
+                res = peka_b40(param_list)        
+
             return JsonResponse(res, safe=False)
         else :
             return JsonResponse({}, safe=False)
@@ -160,6 +163,19 @@ def organ_donation(param_list) :
 
     return res
 
+def peka_b40(param_list) :
+    res = {}
+    params_req = ['state']
+    
+    if all (p in param_list for p in params_req) :
+        dbd_name = param_list['dashboard'][0]
+        state = param_list['state'][0]
+        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
+
+        for i in info:
+            res[ i['chart_name'] ] = i['chart_data'][state]
+
+    return res
 
 def slice_json_by_params(chart_params, url_params, data) :
     r_data = data
