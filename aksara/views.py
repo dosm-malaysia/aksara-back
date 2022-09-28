@@ -41,8 +41,8 @@ class KKMNOW(APIView) :
 
 def facilities(param_list) :
     res = {}
-    params_req = ['fac_type', 'state', 'district']
-    params_opt = ['table']
+    params_req = []
+    params_opt = []
     
     # 1. Table returns by default, doesn't return if table is set to False 
 
@@ -53,6 +53,10 @@ def facilities(param_list) :
         fac_type = '' if 'fac_type' not in param_list else param_list['fac_type'][0]
         district = '' if 'district' not in param_list else param_list['district'][0]
         state = '' if 'state' not in param_list else param_list['state'][0]
+        table = 'true' if 'table' not in param_list else param_list['table'][0]
+        table = True if table == 'true' else False 
+
+        print(table)
 
         chart_params = {
             'locations_mapping' : [state, district, fac_type],
@@ -71,7 +75,7 @@ def facilities(param_list) :
                         temp = temp[x]
                     res[ i['chart_name'] ] = temp
 
-        if 'table' in param_list:
+        if not table:
             res.pop('facilities_table')
 
     return res 
