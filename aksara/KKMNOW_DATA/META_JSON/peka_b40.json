@@ -1,0 +1,81 @@
+{
+    "dashboard_name": "peka_b40",
+    "required_params": [
+      "state"
+    ],
+    "optional_params": [],
+    "charts": {
+      "barchart_ages": {
+        "name": "barchart_ages",
+        "chart_type": "bar_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/peka_b40/pekab40_02_barchart_ages.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "keys": [
+            "state",
+            "period"
+          ],
+          "axis_values": [
+            "age",
+            "screened"
+          ]
+        }
+      },
+      "heatmap_screenrate": {
+        "name": "heatmap_screenrate",
+        "chart_type": "heatmap_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/peka_b40/pekab40_02_heatmap_screenrate.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "cols": [
+            "40-44",
+            "45-49",
+            "50-54",
+            "55-59",
+            "60-64",
+            "65-69",
+            "70-74",
+            "75-79",
+            "80+",
+            "Overall"
+          ],
+          "id": "demog",
+          "keys": [
+            "state",
+            "metric",
+            "demog"
+          ],
+          "null_values": null,
+          "replace_vals": {},
+          "dict_rename": {
+            "female_": "",
+            "male_": ""
+          },
+          "operation": "SET",
+          "row_format" : "upper"
+        }
+      },
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/peka_b40/pekab40_01_timeseries.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "state": {
+            "x": "date",
+            "daily": "daily",
+            "line": "daily_7dma"
+          }
+        }
+      }
+    }
+  }

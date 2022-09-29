@@ -1,0 +1,178 @@
+{
+    "dashboard_name": "covid_vax",
+    "required_params": [
+      "state"
+    ],
+    "optional_params": [],
+    "charts": {
+      "bar_chart": {
+        "name": "bar_chart",
+        "chart_type": "bar_meter",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_vax/covidvax_01_waffle.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "axis_values": [
+            {
+              "age_group": "value"
+            }
+          ],
+          "keys": [
+            "state",
+            "dose"
+          ],
+          "null_vals": 0,
+          "add_key": {},
+          "wanted": [
+            {
+              "col_name": "age_group",
+              "values": [
+                "0-4",
+                "5-11",
+                "12-17",
+                "18-29",
+                "30-39",
+                "40-49",
+                "50-59",
+                "60-69",
+                "70-79",
+                "80+"
+              ]
+            },
+            {
+              "col_name": "metric",
+              "values": [
+                "perc"
+              ]
+            }
+          ],
+          "id_needed": true,
+          "condition": {
+            "metric": "perc"
+          },
+          "post_operation": "_REVERSE_"
+        }
+      },
+      "snapshot": {
+        "name": "snapshot",
+        "chart_type": "snapshot_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_vax/covidvax_03_snapshot.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "main_key": "state",
+          "replace_word": "perc",
+          "null_vals": null,
+          "data": {
+            "total": [
+              "total_booster1",
+              "total_booster2",
+              "total_dose1",
+              "total_dose2"
+            ],
+            "adol": [
+              "adol_booster1",
+              "adol_booster2",
+              "adol_dose1",
+              "adol_dose2"
+            ],
+            "child": [
+              "child_booster1",
+              "child_booster2",
+              "child_dose1",
+              "child_dose2"
+            ],
+            "adult": [
+              "adult_booster1",
+              "adult_booster2",
+              "adult_dose1",
+              "adult_dose2"
+            ]
+          }
+        }
+      },
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_vax/stats.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "keys": [
+            "state",
+            "daily_type"
+          ],
+          "columns": [
+            "daily",
+            "total"
+          ],
+          "null_vals": null
+        }
+      },
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_vax/covidvax_02_timeseries.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "state": {
+            "x": "date",
+            "primary": "daily_primary",
+            "booster": "daily_booster",
+            "booster2": "daily_booster2",
+            "adult": "daily_adult",
+            "adol": "daily_adol",
+            "child": "daily_child",
+            "line_stacked": "daily_7dma",
+            "line_primary": "daily_primary_7dma",
+            "line_booster": "daily_booster_7dma",
+            "line_booster2": "daily_booster2_7dma",
+            "line_adult": "daily_adult_7dma",
+            "line_adol": "daily_adol_7dma",
+            "line_child": "daily_child_7dma"
+          }
+        }
+      },
+      "waffle": {
+        "name": "waffle",
+        "chart_type": "waffle_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_vax/covidvax_01_waffle.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "wanted": [
+            "adult",
+            "child",
+            "elderly",
+            "adolescent",
+            "total"
+          ],
+          "groups": [
+            "state",
+            "age_group",
+            "dose"
+          ],
+          "dict_keys": [
+            "metric",
+            "value"
+          ],
+          "data_arr": {
+            "id": "dose",
+            "label": "dose",
+            "value": {
+              "metric": "perc"
+            }
+          }
+        }
+      }
+    }
+  }

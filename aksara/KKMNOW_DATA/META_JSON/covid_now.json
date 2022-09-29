@@ -1,0 +1,130 @@
+{
+  "dashboard_name": "covid_now",
+  "required_params": [],
+  "optional_params": [],
+  "charts": {
+      "bar_chart": {
+      "name": "bar_chart",
+      "chart_type": "bar_meter",
+      "chart_source": "./KKMNOW_DATA/PARQUET/covid_now/covidnow_05_barcharts.parquet",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "axis_values": [
+          {
+            "label": "value"
+          }
+        ],
+        "keys": [
+          "chart"
+        ],
+        "null_vals": 0,
+        "add_key": {
+          "value_tooltip": "tooltip"
+        },
+        "wanted": [],
+        "id_needed": false,
+        "condition": {},
+        "post_operation": ""
+      }
+      },
+      "choropleth_malaysia": {
+        "name": "choropleth_malaysia",
+        "chart_type": "snapshot_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_now/covidnow_03_choropleth_msia.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "main_key": "state",
+          "replace_word": "",
+          "null_vals": null,
+          "data": {
+            "data": [
+              "users",
+              "views_log",
+              "views",
+              "views_perc",
+              "pop_perc"
+            ]
+          }
+        }
+      },
+      "choropleth_world": {
+        "name": "choropleth_world",
+        "chart_type": "snapshot_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_now/covidnow_02_choropleth_world.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "main_key": "iso3",
+          "replace_word": "",
+          "null_vals": null,
+          "data": {
+            "data": [
+              "users",
+              "views",
+              "views_log",
+              "perc_views",
+              "country"
+            ]
+          }
+        }
+      },
+      "heatmap": {
+        "name": "heatmap",
+        "chart_type": "heatmap_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_now/covidnow_04_heattable.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "cols": [
+            "12am",
+            "1am",
+            "2am",
+            "3am",
+            "4am",
+            "5am",
+            "6am",
+            "7am",
+            "8am",
+            "9am",
+            "10am",
+            "11am",
+            "12pm",
+            "1pm",
+            "2pm",
+            "3pm",
+            "4pm",
+            "5pm",
+            "6pm",
+            "7pm",
+            "8pm",
+            "9pm",
+            "10pm",
+            "11pm"
+          ],
+          "id": "day",
+          "keys": [
+            "day"
+          ],
+          "null_values": null,
+          "replace_vals": {},
+          "dict_rename": {},
+          "operation": "SET",
+          "row_format" : "upper"
+        }
+      },
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/covid_now/covidnow_01_timeseries.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "x": "date",
+          "y": "views",
+          "line": "views_7dma"
+        }
+      }
+  }
+}

@@ -17,28 +17,7 @@ class KKMNOW(APIView) :
         params_req = ['dashboard']
         
         if all (p in param_list for p in params_req) :
-            res = {}
-
-            '''
-            If/else below is temporary, using now only to work development faster.
-            Remove if/elif and create general function once all API's are up.
-            '''
-
-            if param_list['dashboard'][0] == 'blood_donation' :
-                res = blood_donation(param_list)
-            elif param_list['dashboard'][0] == 'covidvax' :
-                res = covidvax(param_list)
-            elif param_list['dashboard'][0] == 'covid_epid' :
-                res = covid_epid(param_list)
-            elif param_list['dashboard'][0] == 'covid_now' :
-                res = covid_now(param_list)
-            elif param_list['dashboard'][0] == 'facilities' :                
-                res = facilities(param_list)
-            elif param_list['dashboard'][0] == 'organ_donation' :
-                res = organ_donation(param_list)
-            elif param_list['dashboard'][0] == 'peka_b40' :
-                res = peka_b40(param_list)        
-
+            res = handle_request(param_list)
             return JsonResponse(res, safe=False)
         else :
             return JsonResponse({}, safe=False)
@@ -60,10 +39,8 @@ def facilities(param_list) :
         table = 'true' if 'table' not in param_list else param_list['table'][0]
         table = True if table == 'true' else False 
 
-        print(table)
-
         chart_params = {
-            'locations_mapping' : [state, district, fac_type],
+            'locations' : [state, district, fac_type],
             'distances_within' : [fac_type, state, district],
             'distances_between' : [fac_type, 'district']
         }
@@ -81,101 +58,42 @@ def facilities(param_list) :
 
         if not table:
             res.pop('facilities_table')
-
     return res 
 
-def covid_now(param_list) :
+def handle_request(param_list) :
+    dbd_name = param_list['dashboard'][0]
+    dbd_info = MetaJson.objects.filter(dashboard_name=dbd_name).values()
+    dbd_info = dbd_info[0]
+    dbd_info = dbd_info['dashboard_meta']
+
+    params_req = dbd_info['required_params']
+    params_opt = dbd_info['optional_params']
+
+    # Caveat for facilities, sort out next
     res = {}
-    params_req = []
     
-    if all (p in param_list for p in params_req) :
-        dbd_name = param_list['dashboard'][0]
-        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-
-        for i in info:
-            res[ i['chart_name'] ] = i['chart_data']
-
-    return res 
-
-def covid_epid(param_list) :
-    res = {}
-    params_req = ['state']
-    
-    if all (p in param_list for p in params_req) :
-        dbd_name = param_list['dashboard'][0]
-        state = param_list['state'][0]
-        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-
-        for i in info:
-            if i['chart_name'] in ['snapshot_table', 'snapshot_bar', 'bar_chart'] :
-                res[ i['chart_name'] ] = i['chart_data']
-            else :
-                res[ i['chart_name'] ] = i['chart_data'][state]
-
-    return res    
-
-def covidvax(param_list) :
-    res = {}
-    params_req = ['state']
-    
-    if all (p in param_list for p in params_req) :
-        dbd_name = param_list['dashboard'][0]
-        state = param_list['state'][0]
-        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-
-        for i in info:
-            if i['chart_name'] == 'snapshot_chart' :
-                res[ i['chart_name'] ] = i['chart_data']
-            else :
-                res[ i['chart_name'] ] = i['chart_data'][state]
-
+    if dbd_name == 'facilities' :
+        res = facilities(param_list)
+    else : 
+        if all (p in param_list for p in params_req) :
+            data = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
+            for i in data :
+                api_type = i['api_type']
+                api_params = dbd_info['charts'][ i['chart_name'] ]['api_params']
+                if api_type == 'static':
+                    res[ i['chart_name'] ] = i['chart_data']
+                else :
+                    if len(api_params) > 0 : 
+                        temp = i['chart_data']
+                        for a in api_params :
+                            key = param_list[a][0]
+                            if key in temp :
+                                temp = temp[ key ]
+                        res[ i['chart_name'] ] = temp
+                    else :
+                        res[ i['chart_name'] ] = i['chart_data']
     return res
 
-def blood_donation(param_list) :
-    res = {}
-    params_req = ['state']
-    
-    if all (p in param_list for p in params_req) :
-        dbd_name = param_list['dashboard'][0]
-        state = param_list['state'][0]
-        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-
-        for i in info:
-            print(i['chart_name'])
-            if i['chart_name'] in ['timeseries_facility', 'heatmap_bloodstock', 'map_facility'] :
-                res[ i['chart_name'] ] = i['chart_data']
-            else :
-                res[ i['chart_name'] ] = i['chart_data'][state]
-
-    return res
-
-def organ_donation(param_list) :
-    res = {}
-    params_req = ['state']
-    
-    if all (p in param_list for p in params_req) :
-        dbd_name = param_list['dashboard'][0]
-        state = param_list['state'][0]
-        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-
-        for i in info:
-            res[ i['chart_name'] ] = i['chart_data'][state]
-
-    return res
-
-def peka_b40(param_list) :
-    res = {}
-    params_req = ['state']
-    
-    if all (p in param_list for p in params_req) :
-        dbd_name = param_list['dashboard'][0]
-        state = param_list['state'][0]
-        info = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-
-        for i in info:
-            res[ i['chart_name'] ] = i['chart_data'][state]
-
-    return res
 
 def slice_json_by_params(chart_params, url_params, data) :
     r_data = data
