@@ -45,11 +45,9 @@ class Command(BaseCommand):
                 c_data['variables'] = chart_list[k]['variables']
                 c_data['input'] = chart_list[k]['chart_source']
                 api_type = chart_list[k]['api_type']
-                try:
-                    res = dashboard_builder.build_chart(chart_list[k]['chart_type'], c_data)
-                    p = KKMNowJSON.objects.create(dashboard_name=dbd_name, chart_name=k, chart_type=chart_type,api_type=api_type, chart_data=res)
-                    p.save()                    
-                    print("SUCCESS : " + chart_name + ", Dashboard : " + dbd_name)
-                except:
-                    print("FAILED : " + chart_name + ", Dashboard : " + dbd_name)
+                res = dashboard_builder.build_chart(chart_list[k]['chart_type'], c_data)
+                p = KKMNowJSON.objects.create(dashboard_name=dbd_name, chart_name=k, chart_type=chart_type,api_type=api_type, chart_data=res)
+                p.save()                    
+                # print("SUCCESS : " + chart_name + ", Dashboard : " + dbd_name)
+                # print("FAILED : " + chart_name + ", Dashboard : " + dbd_name)
 
