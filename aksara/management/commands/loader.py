@@ -21,9 +21,9 @@ class Command(BaseCommand):
         KKMNowJSON.objects.all().delete()
         MetaJson.objects.all().delete()
 
-        META_DIR = os.getcwd() + '\\' + 'aksara\\' + 'KKMNOW_DATA\\META_JSON\\'
+        META_DIR = os.path.dirname(os.path.realpath(__file__)) + '\\META_JSON\\'
         meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
-        
+
         for meta in meta_files : 
             f_meta = META_DIR + meta
             f = open(f_meta)
