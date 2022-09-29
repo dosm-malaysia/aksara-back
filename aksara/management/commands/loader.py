@@ -21,7 +21,7 @@ class Command(BaseCommand):
         KKMNowJSON.objects.all().delete()
         MetaJson.objects.all().delete()
 
-        META_DIR = os.path.dirname(os.path.realpath(__file__)) + '\\META_JSON\\'
+        META_DIR = os.path.dirname(os.path.realpath(__file__)) + '/META_JSON/'
         meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
 
         for meta in meta_files : 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             f = open(f_meta)
             data = json.load(f)
             dbd_name = meta.replace(".json", "")
-            p = MetaJson.objects.create(dashboard_name=meta,dashboard_meta=data)
+            p = MetaJson.objects.create(dashboard_name=dbd_name,dashboard_meta=data)
 
         meta_json_list = MetaJson.objects.values() # If empty, read from file
 

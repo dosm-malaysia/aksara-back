@@ -63,11 +63,15 @@ def facilities(param_list) :
 def handle_request(param_list) :
     dbd_name = param_list['dashboard'][0]
     dbd_info = MetaJson.objects.filter(dashboard_name=dbd_name).values()
-    dbd_info = dbd_info[0]
-    dbd_info = dbd_info['dashboard_meta']
+    
+    params_req = []
 
-    params_req = dbd_info['required_params']
-    params_opt = dbd_info['optional_params']
+    if len(dbd_info) > 0 :
+        dbd_info = dbd_info[0]
+        dbd_info = dbd_info['dashboard_meta']
+
+        params_req = dbd_info['required_params']
+        params_opt = dbd_info['optional_params']
 
     # Caveat for facilities, sort out next
     res = {}
@@ -77,21 +81,22 @@ def handle_request(param_list) :
     else : 
         if all (p in param_list for p in params_req) :
             data = KKMNowJSON.objects.filter(dashboard_name=dbd_name).values()
-            for i in data :
-                api_type = i['api_type']
-                api_params = dbd_info['charts'][ i['chart_name'] ]['api_params']
-                if api_type == 'static':
-                    res[ i['chart_name'] ] = i['chart_data']
-                else :
-                    if len(api_params) > 0 : 
-                        temp = i['chart_data']
-                        for a in api_params :
-                            key = param_list[a][0]
-                            if key in temp :
-                                temp = temp[ key ]
-                        res[ i['chart_name'] ] = temp
-                    else :
+            if len(data) > 0 : 
+                for i in data :
+                    api_type = i['api_type']
+                    api_params = dbd_info['charts'][ i['chart_name'] ]['api_params']
+                    if api_type == 'static':
                         res[ i['chart_name'] ] = i['chart_data']
+                    else :
+                        if len(api_params) > 0 : 
+                            temp = i['chart_data']
+                            for a in api_params :
+                                key = param_list[a][0]
+                                if key in temp :
+                                    temp = temp[ key ]
+                            res[ i['chart_name'] ] = temp
+                        else :
+                            res[ i['chart_name'] ] = i['chart_data']
     return res
 
 
