@@ -1,0 +1,119 @@
+{
+    "dashboard_name": "organ_donation",
+    "required_params": [
+      "state"
+    ],
+    "optional_params": [],
+    "charts": {
+      "barchart_age": {
+        "name": "barchart_age",
+        "chart_type": "bar_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/organ_donation/organ_02_barchart_age.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "keys": [
+            "state",
+            "period"
+          ],
+          "axis_values": [
+            "age_group",
+            "new_donors"
+          ]
+        }
+      },
+      "barchart_reasons": {
+        "name": "barchart_reasons",
+        "chart_type": "bar_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/organ_donation/organ_03_barchart_reasons.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "keys": [
+            "state",
+            "period"
+          ],
+          "axis_values": [
+            "reason",
+            "pledgers"
+          ]
+        }
+      },
+      "barchart_time": {
+        "name": "barchart_time",
+        "chart_type": "bar_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/organ_donation/organ_02_barchart_time.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "keys": [
+            "state",
+            "type"
+          ],
+          "axis_values": [
+            "period",
+            "new_donors"
+          ]
+        }
+      },
+      "heatmap_pledgerrate": {
+        "name": "heatmap_pledgerrate",
+        "chart_type": "heatmap_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/organ_donation/organ_03_heatmap_pledgerrate.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "cols": [
+            "0-9",
+            "10-19",
+            "20-29",
+            "30-39",
+            "40-49",
+            "50-59",
+            "60-69",
+            "70-79",
+            "80+",
+            "Overall"
+          ],
+          "id": "demog",
+          "keys": [
+            "state",
+            "metric",
+            "demog"
+          ],
+          "null_values": null,
+          "replace_vals": {},
+          "dict_rename": {
+            "female_": "",
+            "male_": ""
+          },
+          "operation": "SET",
+          "row_format" : "upper"
+        }
+      },
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "./KKMNOW_DATA/PARQUET/organ_donation/organ_01_timeseries.parquet",
+        "api_type": "dynamic",
+        "api_params": [
+          "state"
+        ],
+        "variables": {
+          "state": {
+            "x": "date",
+            "daily": "daily",
+            "line": "daily_7dma"
+          }
+        }
+      }
+    }
+  }
