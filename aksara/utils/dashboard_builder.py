@@ -6,7 +6,7 @@ def build_chart(chart_type, data) :
     cwd = os.getcwd()
     variables = data['variables']
     input_file = data['input'].replace("./", '')
-    f_name = os.path.dirname(os.path.realpath(__file__)) + input_file
+    f_name = os.path.dirname(os.path.realpath(__file__)) + '/' + input_file
     input_file = f_name
 
     match chart_type : 
