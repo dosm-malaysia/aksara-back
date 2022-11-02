@@ -1,7 +1,6 @@
 import os
 from os import listdir
 from os.path import isfile, join
-from wsgiref import validate
 from aksara.models import MetaJson, KKMNowJSON
 from aksara.utils import triggers
 from aksara.utils import data_utils
