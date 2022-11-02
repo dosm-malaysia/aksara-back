@@ -1,0 +1,241 @@
+{
+  "dashboard_name": "blood_donation",
+  "required_params": [
+    "state"
+  ],
+  "optional_params": [],
+  "charts": {
+    "bar_chart_age": {
+      "name": "bar_chart_age",
+      "chart_type": "bar_chart",
+      "chart_source": "blood_03_barchart_age.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "keys": [
+          "state",
+          "period"
+        ],
+        "axis_values": [
+          "age_group",
+          "new_donors"
+        ]
+      }
+    },
+    "bar_chart_time": {
+      "name": "bar_chart_time",
+      "chart_type": "bar_chart",
+      "chart_source": "blood_03_barchart_time.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "keys": [
+          "state",
+          "type"
+        ],
+        "axis_values": [
+          "period",
+          "new_donors"
+        ]
+      }
+    },
+    "heatmap_bloodstock": {
+      "name": "heatmap_bloodstock",
+      "chart_type": "heatmap_chart",
+      "chart_source": "blood_01_stock_snapshot.parquet",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "cols": [
+          "a",
+          "b",
+          "ab",
+          "o"
+        ],
+        "id": "state",
+        "keys": [
+          "state"
+        ],
+        "null_values": null,
+        "replace_vals": {
+          "Safe": 0,
+          "Mid": 1,
+          "Low": 2
+        },
+        "dict_rename": {
+          "female_": "",
+          "male_": ""
+        },
+        "row_format": "upper",
+        "operation": "SET"
+      }
+    },
+    "heatmap_donorrate": {
+      "name": "heatmap_donorrate",
+      "chart_type": "heatmap_chart",
+      "chart_source": "blood_04_heatmap_donorrate.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "cols": [
+          "17-24",
+          "25-29",
+          "30-34",
+          "35-39",
+          "40-44",
+          "45-49",
+          "50-54",
+          "55-59",
+          "60-64",
+          "Overall"
+        ],
+        "id": "demog",
+        "keys": [
+          "state",
+          "metric",
+          "demog"
+        ],
+        "null_values": null,
+        "replace_vals": {},
+        "dict_rename": {
+          "[a-zA-Z]+_" : ""
+        },
+        "operation": "SET",
+        "row_format": "title"
+      }
+    },
+    "heatmap_retention": {
+      "name": "heatmap_retention",
+      "chart_type": "heatmap_chart",
+      "chart_source": "blood_04_heatmap_retention.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "cols": {
+          "x": "donated_after",
+          "y": "retention_rate"
+        },
+        "id": "donated_in",
+        "keys": [
+          "state",
+          "donated_in"
+        ],
+        "null_values": null,
+        "replace_vals": {},
+        "dict_rename": {},
+        "operation": "APPEND",
+        "row_format": "upper"
+      }
+    },
+    "timeseries_all": {
+      "name": "timeseries_all",
+      "chart_type": "timeseries_chart",
+      "chart_source": "blood_02_timeseries.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "state": {
+          "x": "date",
+          "daily": "daily",
+          "line_daily": "daily_7dma"
+        }
+      }
+    },
+    "timeseries_bloodstock": {
+      "name": "timeseries_bloodstock",
+      "chart_type": "timeseries_chart",
+      "chart_source": "blood_01_stock_timeseries.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "state": {
+          "x": "date",
+          "type_a": "stock_a",
+          "type_b": "stock_b",
+          "type_ab": "stock_ab",
+          "type_o": "stock_o"
+        }
+      }
+    },
+    "timeseries_facility": {
+      "name": "timeseries_facility",
+      "chart_type": "timeseries_chart",
+      "chart_source": "blood_05_timeseries_facility.parquet",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "state": {
+          "hospital": {
+            "x": "date",
+            "daily": "daily",
+            "line": "daily_7dma"
+          }
+        }
+      }
+    },
+    "map_facility": {
+      "name": "map_facility",
+      "chart_type": "custom_chart",
+      "chart_source": "blood_05_map_facility.parquet",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "keys": [
+          "state",
+          "hospital"
+        ],
+        "columns": [
+          "lat",
+          "lon"
+        ],
+        "null_vals": null
+      }
+    },
+    "barchart_key_variables" : {
+      "name": "barchart_key_variables",
+      "chart_type": "bar_meter",
+      "chart_source": "blood_02_barcharts.parquet",
+      "api_type": "dynamic",
+      "api_params": [
+        "state"
+      ],
+      "variables": {
+        "axis_values" : [{"variable" : "value"}],
+        "keys" : ["state", "period", "chart"],          
+        "null_vals" : null,
+        "add_key" : {},
+        "wanted" : [],
+        "id_needed" : false,
+        "condition" : {},
+        "post_operation" : ""  
+      }        
+    },
+    "choropleth_malaysia": {
+      "name": "choropleth_malaysia",
+      "chart_type": "snapshot_chart",
+      "chart_source": "blood_06_choropleth_msia.parquet",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "main_key": "state",
+        "replace_word": "",
+        "null_vals": null,
+        "data": {
+          "data": ["perc"]
+        }
+      }
+    }    
+  }
+}

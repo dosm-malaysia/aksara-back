@@ -1,0 +1,20 @@
+/.vscode
+
+*.db
+*.pyc
+*.bak
+*.sqlite3
+__pycache__/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Loader
+KKMNOW_SRC
+repo.zip

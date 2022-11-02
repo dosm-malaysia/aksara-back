@@ -1,0 +1,29 @@
+{
+    "dashboard_name": "facilities_table",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "facilities_table": {
+        "name": "facilities_table",
+        "chart_type": "snapshot_chart",
+        "chart_source": "facilities_01_table.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "main_key": "state",
+          "replace_word": "",
+          "null_vals": null,
+          "data": {
+            "data": [
+              "district",
+              "sector",
+              "type",
+              "name",
+              "address",
+              "phone"
+            ]
+          }
+        }
+      }
+    }
+  }

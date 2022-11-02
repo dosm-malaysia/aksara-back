@@ -1,10 +1,6 @@
 import pandas as pd
-import json
 import numpy as np
-import copy
-import ast
 from mergedeep import merge
-import datetime
 from aksara.utils.general_chart_helpers import *
 from aksara.utils.operations import *
 from dateutil.relativedelta import relativedelta
@@ -17,6 +13,14 @@ def bar_chart(file_name, variables) :
 
     if 'state' in df.columns : 
         df['state'].replace(STATE_ABBR, inplace=True)
+
+    if 'district' in df.columns : # District usually uses has spaces and Uppercase 
+        df['district'] = df['district'].apply(lambda x : x.lower().replace(' ', '-'))
+    
+    # Remove later on!!
+    if 'type' in df.columns :  
+        df['type'] = df['type'].apply(lambda x : x.lower())
+
     df = df.replace({np.nan: None})
 
     keys = variables['keys']
@@ -32,7 +36,6 @@ def bar_chart(file_name, variables) :
         for b in group[::-1]:
             result = {b: result}
         if isinstance(axis_values, list) : 
-            # group = group[0] if len(group) == 1 else group
             x_list = df.groupby(keys)[axis_values[0]].get_group(group).to_list()
             y_list = df.groupby(keys)[axis_values[1]].get_group(group).to_list()
             final_d = {'x' : x_list, 'y' : y_list}
@@ -135,6 +138,9 @@ def custom_chart(file_name, variables) :
     if 'state' in df.columns : 
         df['state'].replace(STATE_ABBR, inplace=True)
 
+    if 'district' in df.columns : # District usually uses has spaces and Uppercase 
+        df['district'] = df['district'].apply(lambda x : x.lower().replace(' ', '-'))
+
     keys = variables['keys']
 
     df['data'] = df[ variables['columns'] ].to_dict(orient="records")
@@ -165,13 +171,14 @@ def heatmap_chart(file_name, variables) :
     keys = variables['keys']
     replace_vals = variables['replace_vals']
     dict_rename = variables['dict_rename']
-    operation = variables['operation']
     row_format = variables['row_format']
 
     df = pd.read_parquet(file_name)
-    df['id'] = df[id] # Create ID first, cause ID may be 'state'
+    
     if 'state' in df.columns : 
         df['state'].replace(STATE_ABBR, inplace=True)
+
+    df['id'] = df[id]    
     df = df.replace({np.nan: variables['null_values']})
     col_list = []
 
@@ -194,14 +201,27 @@ def heatmap_chart(file_name, variables) :
     df['data'] = df[ col_list ].values.tolist()
     df['final'] = df[ ['id', 'data'] ].apply(lambda s: s.to_dict(), axis=1)
 
-    res = prepopulate_dict(keys, df)
+    df['u_groups'] = list(df[keys].itertuples(index=False, name=None))
+    u_groups_list = df['u_groups'].unique().tolist()
+    
+    res = {}
+    for group in u_groups_list : 
+        result = {}
+        for b in group[::-1]:
+            result = {str(b): result}
+        group = group[0] if len(group) == 1 else group    
+        data_arr = df.groupby(keys)['final'].get_group( group ).values
+        
+        cur_id = df.groupby(keys)['id'].get_group( group ).unique()[0]
+        cur_id = cur_id if isinstance(cur_id,str) else int(cur_id)
+        
+        group = [str(group)] if isinstance(group, str) else [str(i) for i in group]
+        data_arr = data_arr[0]['data'] if len(data_arr) == 1 else [x['data'][0] for x in data_arr]
+        final_dict = {'id' : cur_id, 'data' : data_arr}
 
-    for index, row in df.iterrows():  
-        k_list = []
-        for k in keys :
-            k_list.append(row[k])
-        set_dict(res, k_list, row['final'], operation)
-
+        set_dict(result, group, final_dict, 'SET')
+        merge(res, result)
+    
     return res
 
 '''
@@ -217,11 +237,14 @@ def snapshot_chart(file_name, variables) :
     replace_word = variables['replace_word']
     data = variables['data']
 
+    # District usually uses has spaces and Uppercase 
+    if 'district' in df.columns and 'district' not in data['data']:
+        df['district'] = df['district'].apply(lambda x : x.lower().replace(' ', '-'))
+
     record_list = list(data.keys())
     record_list.append('index')
     record_list.append(main_key)
 
-    # df['index'] = range(0, len(df[main_key].unique()))
     df['index'] = range(0, len(df[main_key]))
 
     changed_cols = {}
@@ -232,23 +255,10 @@ def snapshot_chart(file_name, variables) :
 
     res_dict = df[record_list].to_dict(orient="records")
     
-    res_json = {}
-    v2_res = []
+    res = []
 
     for i in res_dict :
-        # v1 code
-        # res_json[ i[main_key] ] = i
-
-        # v2 Code
-        v2_res.append(i)
-
-    # Pushes all the items into an array
-    # v1 Code
-    # res = []
-    # for k, v in res_json.items() :
-    #     res.append( res_json[k] )
-
-    res = v2_res
+        res.append(i)
 
     return res
 
@@ -257,7 +267,7 @@ Builds Timeseries Chart
 '''
 def timeseries_chart(file_name, variables) :
     df = pd.read_parquet(file_name)
-    df = df.replace({np.nan: 0})
+    df = df.replace({np.nan: None})
     
     DATE_RANGE = ''
     if 'DATE_RANGE' in variables : 
@@ -278,12 +288,14 @@ def timeseries_chart(file_name, variables) :
     if 'state' in df.columns:
         df['state'].replace(STATE_ABBR, inplace=True)
 
-    keys_list = []
-    get_nested_keys(variables, keys_list, 'KEYS')
-    keys_list = keys_list[::-1]
+    structure_info = {
+        'key_list' : [],
+        'value_obj' : []
+    }
 
-    value_obj = []
-    get_nested_keys(variables, value_obj, 'VALUES')
+    get_nested_keys(variables, structure_info)
+    keys_list = structure_info['key_list'][::-1]
+    value_obj = structure_info['value_obj']
 
     if len(keys_list) == 0 : 
         res = {}
@@ -366,3 +378,38 @@ def helpers_custom(file_name) :
         state_mapping['state_district_mapping'][state] = df.groupby('state').get_group(state)['district'].unique().tolist()
 
     return state_mapping
+
+'''
+Maps Latitude and Longitudes
+'''
+def map_lat_lon(file_name, variables) :
+    keys = variables['keys']
+    values = variables['values'] 
+
+    df = pd.read_parquet(file_name)
+    df = df.replace({np.nan: variables['null_vals']})
+
+    if 'state' in df.columns : 
+        df['state'].replace(STATE_ABBR, inplace=True)
+
+    if 'district' in df.columns : 
+        df['district'] = df['district'].apply(lambda x : x.lower().replace(' ', '-'))
+    
+    # Remove in the future
+    if 'type' in df.columns : 
+        df['type'] = df['type'].apply(lambda x:x.lower())
+    
+    df['u_groups'] = list(df[keys].itertuples(index=False, name=None))
+    u_groups_list = df['u_groups'].unique().tolist()
+
+    res = {}
+
+    for group in u_groups_list : 
+        result = {}
+        for b in group[::-1]:
+            result = {b: result}
+        d_values = df.groupby(keys).get_group(group)[values].to_dict(orient='records')
+        set_dict(result, list(group), d_values, 'SET')
+        merge(res, result)
+
+    return res
