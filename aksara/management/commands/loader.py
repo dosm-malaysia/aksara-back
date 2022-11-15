@@ -3,6 +3,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from aksara.utils import cron_utils
+from aksara.catalog_utils import catalog_builder
 
 from django.core.cache import cache
 
@@ -28,4 +29,7 @@ class Command(BaseCommand):
             - Rebuilds the db, by clearing existing values, and inputting new ones
         '''
 
-        cron_utils.data_operation(operation)
+        if operation == 'DATA_CATALOG' : 
+            catalog_builder.test_build()
+        else : 
+            cron_utils.data_operation(operation)

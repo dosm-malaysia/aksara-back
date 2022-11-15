@@ -9,8 +9,8 @@ from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from aksara.utils import cron_utils, triggers
-from aksara.serializers import MetaSerializer, KKMSerializer
-from aksara.models import MetaJson, KKMNowJSON
+from aksara.serializers import MetaSerializer, KKMSerializer, CatalogSerializer
+from aksara.models import MetaJson, KKMNowJSON, CatalogJson
 
 from threading import Thread
 
@@ -43,6 +43,53 @@ class KKMNOW(APIView):
             return JsonResponse(res, safe=False)
         else:
             return JsonResponse({}, safe=False)
+
+class DATA_VARIABLE(APIView):
+    def get(self, request, format=None):
+        param_list = dict(request.GET)
+        params_req = ["id"]
+
+        if all(p in param_list for p in params_req):
+            res = data_variable_handler(param_list)
+            return JsonResponse(res, safe=False)
+        else:
+            return JsonResponse({}, safe=False)
+
+class DATA_CATALOG(APIView) :
+    def get(self, request, format=None):
+        param_list = dict(request.GET)
+        info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')
+        res = {}
+
+        for item in info.iterator():
+            category = item['catalog_category'] 
+            item.pop('catalog_category', None)
+            if category not in res : 
+                temp = [item]
+                res[category] = temp
+            else : 
+                res[category].append(item)
+
+        return JsonResponse(res, safe=False)
+
+
+def data_variable_handler(param_list) :
+    var_id = param_list["id"][0]
+    filter = ''
+    info = CatalogJson.objects.filter(id=var_id).values('catalog_data')
+    info = info[0]['catalog_data']
+
+    if 'filter' in param_list : 
+        filter = param_list["filter"][0]
+    else : 
+        filter = info['API']['default']
+
+    temp_chart = info['chart_details']['chart'][filter]
+    info['chart_details']['chart'] = temp_chart
+
+    if len(info) == 0 : 
+        return {}
+    return info
 
 def handle_request(param_list):
     dbd_name = str(param_list["dashboard"][0])
