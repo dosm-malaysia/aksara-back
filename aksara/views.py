@@ -72,20 +72,33 @@ class DATA_CATALOG(APIView) :
 
         return JsonResponse(res, safe=False)
 
+def data_variable_chart_handler(data, chart_type, param_list) : 
+    if chart_type == 'TIMESERIES' :
+        filter = data['API']['filter_default']
+        range = data['API']['range_default']
+
+        if 'filter' in param_list : 
+            filter = param_list['filter'][0]
+
+        if 'range' in param_list : 
+            range =  param_list['range'][0]
+
+        table_data = {}
+        table_data['columns'] = data['chart_details']['chart'][filter]['TABLE']['columns'] 
+        table_data['data'] = data['chart_details']['chart'][filter]['TABLE']['data'][range]
+        chart_data = data['chart_details']['chart'][filter][range]
+        intro = data['chart_details']['intro']
+
+        return {'chart_data' : chart_data, 'table_data' : table_data, 'intro' : intro}
+
 
 def data_variable_handler(param_list) :
     var_id = param_list["id"][0]
-    filter = ''
     info = CatalogJson.objects.filter(id=var_id).values('catalog_data')
     info = info[0]['catalog_data']
-
-    if 'filter' in param_list : 
-        filter = param_list["filter"][0]
-    else : 
-        filter = info['API']['default']
-
-    temp_chart = info['chart_details']['chart'][filter]
-    info['chart_details']['chart'] = temp_chart
+    chart_type = info['API']['chart_type']
+    
+    info['chart_details'] = data_variable_chart_handler(info, chart_type, param_list)
 
     if len(info) == 0 : 
         return {}

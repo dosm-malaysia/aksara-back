@@ -7,4 +7,5 @@ def build_chart(file, data) :
         file_link = file['link_parquet']
         variables = data['chart']['chart_variables']
         frequency = data['catalog_filters']['frequency']
-        return cb.timeseries_chart(file_link, variables, frequency)        
+        chart_name = file['variables'][data['id'] - 1]['name']
+        return cb.timeseries_chart(file_link, variables, frequency, chart_name)        

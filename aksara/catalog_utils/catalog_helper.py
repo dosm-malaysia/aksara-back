@@ -1,3 +1,5 @@
+from aksara.catalog_utils import chart_utils as cu
+
 def build_metadata_key(file, data, cur_id) : 
     res = {}
 
@@ -18,3 +20,24 @@ def build_metadata_key(file, data, cur_id) :
             res['metadata']['out_dataset'].append(v)
 
     return res['metadata']
+
+def additional_info(file, data, chart_type, res) : 
+    if chart_type == 'TIMESERIES' :
+        res['API']['range_default'] = data['catalog_filters']['frequency']
+        res['API']['range_values'] = cu.get_range_values(data['catalog_filters']['frequency'])
+
+def format_intro(intro) : 
+    intro_frmtted = {
+        'id' : intro['id'],
+        'name' : intro['name'],
+        'en' : {
+            'title' : intro['title_en'],
+            'desc' : intro['desc_en']
+        },
+        'bm' : {
+            'title' : intro['title_bm'],
+            'desc' : intro['desc_bm']
+        }
+    }
+
+    return intro_frmtted

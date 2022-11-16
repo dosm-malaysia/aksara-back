@@ -29,7 +29,9 @@ def test_build() :
                 }
         
         res['chart_details'] = {}
-        res['chart_details']['intro'] = file['variables'][cur_id - 1]
+        res['chart_details']['intro'] = ch.format_intro(file['variables'][cur_id - 1])
+        res['chart_details']['intro']['unique_id'] = unique_id
+
         res['chart_details']['chart'] = cp.build_chart(file, data)
 
         res['explanation'] = data['metadata_lang'] # Builds the explanations
@@ -46,8 +48,10 @@ def test_build() :
         be_vals = df[api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
 
         res['API'] = {}
-        res['API']['default'] = be_vals[0]
+        res['API']['filter_default'] = be_vals[0]
         res['API']['mapping'] = dict(zip(fe_vals, be_vals))
+        res['API']['chart_type'] = data['chart']['chart_type']
+        ch.additional_info(file, data, data['chart']['chart_type'], res)
 
         db_input['catalog_data'] = res
         obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
