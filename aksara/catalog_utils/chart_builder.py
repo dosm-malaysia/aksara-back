@@ -9,6 +9,7 @@ def timeseries_chart(file_name, variables, freq, chart_name) :
 
     keys_list = variables['parents']
     value_obj = variables['format']
+    operation = variables['operation']
 
     for key in keys_list : 
         df[key] = df[key].apply(lambda x : x.lower().replace(' ', '-'))
@@ -28,7 +29,7 @@ def timeseries_chart(file_name, variables, freq, chart_name) :
 
         cur_group = group[0] if len(group) == 1 else group
         
-        cur_data = cu.slice_timeline(df, range_values, keys_list, value_obj, cur_group, chart_name)
+        cur_data = cu.slice_timeline(df, range_values, keys_list, value_obj, cur_group, chart_name, operation)
         cu.set_dict(result, list(group), cur_data)
         
         merge(res, result)
