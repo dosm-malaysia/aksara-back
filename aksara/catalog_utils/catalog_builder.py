@@ -70,10 +70,21 @@ def test_build() :
                     be_vals = df[api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
 
                     res['API'] = {}
-                    res['API']['filter_default'] = be_vals[0]
-                    res['API']['mapping'] = dict(zip(fe_vals, be_vals))
+                    res['API']['filters'] = []
                     res['API']['chart_type'] = data['chart']['chart_type']
-                    ch.additional_info(file, data, data['chart']['chart_type'], res)
+                    filter = {
+                        'key' : 'filter',
+                        'default' : {
+                            'label' : fe_vals[0],
+                            'value' : be_vals[0]
+                        },
+                        'options' : [ {'label' : k, 'value' : v} for k, v in dict(zip(fe_vals, be_vals)).items() ]
+                    }
+                    res['API']['filters'].append(filter)
+
+                    # res['API']['filter_default'] = be_vals[0]
+                    # res['API']['mapping'] = dict(zip(fe_vals, be_vals))
+                    ch.additional_info(file, data, data['chart']['chart_type'], res['API']['filters'])
 
                     db_input['catalog_data'] = res
                     obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)

@@ -62,6 +62,7 @@ class DATA_CATALOG(APIView) :
         res = {}
 
         res['TOTAL_ALL'] = len(info)
+        res['dataset'] = {}
 
         lang = request.query_params.get('lang', 'en')
         lang_mapping = {'en' : 0, 'bm' : 1}
@@ -73,17 +74,23 @@ class DATA_CATALOG(APIView) :
             category = item['catalog_category'] 
             item.pop('catalog_category', None)
             item['catalog_name'] = item['catalog_name'].split(" | ")[ lang_mapping[lang] ]
-            if category not in res : 
-                res[category] = [item]
+            if category not in res['dataset'] : 
+                res['dataset'][category] = [item]
             else : 
-                res[category].append(item)
+                res['dataset'][category].append(item)
 
         return JsonResponse(res, safe=False)
 
 def data_variable_chart_handler(data, chart_type, param_list) : 
     if chart_type == 'TIMESERIES' :
-        filter = data['API']['filter_default']
-        range = data['API']['range_default']
+        filter = ''
+        range = ''
+        
+        for i in data['API']['filters'] : 
+            if i['key'] == 'filter' : 
+                filter = i['default']['value']
+            elif i['key'] == 'range' : 
+                filter = i['default']['value']
 
         if 'filter' in param_list : 
             filter = param_list['filter'][0]

@@ -23,8 +23,28 @@ def build_metadata_key(file, data, cur_id) :
 
 def additional_info(file, data, chart_type, res) : 
     if chart_type == 'TIMESERIES' :
-        res['API']['range_default'] = data['catalog_filters']['frequency']
-        res['API']['range_values'] = cu.get_range_values(data['catalog_filters']['frequency'])
+        timeseries_vals = {
+            'DAILY' : 'Daily',
+            'WEEKLY' : 'Weekly',
+            'MONTHLY' : 'Monthly',
+            'YEARLY' : 'Yearly'
+        }
+
+        pos_vals = cu.get_range_values(data['catalog_filters']['frequency'])
+        options = []
+        for p in pos_vals : 
+            options.append({'label' : timeseries_vals[p], 'value' : p})
+
+        filter = {
+            'key' : 'range',
+            'default' : {
+                'label' : timeseries_vals[ data['catalog_filters']['frequency'] ],
+                'value' : data['catalog_filters']['frequency']
+            },
+            'options' : options
+        }
+        res.append(filter)
+
 
 def format_intro(intro) : 
     intro_frmtted = {
