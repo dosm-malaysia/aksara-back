@@ -61,7 +61,7 @@ class DATA_CATALOG(APIView) :
         info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')                
         res = {}
 
-        res['TOTAL_ALL'] = len(info)
+        res['total_all'] = len(info)
         res['dataset'] = {}
 
         lang = request.query_params.get('lang', 'en')
