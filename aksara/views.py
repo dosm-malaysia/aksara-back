@@ -90,7 +90,7 @@ def data_variable_chart_handler(data, chart_type, param_list) :
             if i['key'] == 'filter' : 
                 filter = i['default']['value']
             elif i['key'] == 'range' : 
-                filter = i['default']['value']
+                range = i['default']['value']
 
         if 'filter' in param_list : 
             filter = param_list['filter'][0]
