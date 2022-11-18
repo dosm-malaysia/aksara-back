@@ -58,15 +58,23 @@ class DATA_VARIABLE(APIView):
 class DATA_CATALOG(APIView) :
     def get(self, request, format=None):
         param_list = dict(request.GET)
-        info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')
+        info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')                
         res = {}
+
+        res['TOTAL_ALL'] = len(info)
+
+        lang = request.query_params.get('lang', 'en')
+        lang_mapping = {'en' : 0, 'bm' : 1}
+
+        if lang not in lang_mapping : 
+            lang = 'en'
 
         for item in info.iterator():
             category = item['catalog_category'] 
             item.pop('catalog_category', None)
+            item['catalog_name'] = item['catalog_name'].split(" | ")[ lang_mapping[lang] ]
             if category not in res : 
-                temp = [item]
-                res[category] = temp
+                res[category] = [item]
             else : 
                 res[category].append(item)
 

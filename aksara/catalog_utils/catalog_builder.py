@@ -23,57 +23,58 @@ def test_build() :
         cron_utils.write_as_binary(res['file_name'], res['data'])
         cron_utils.extract_zip(res['file_name'], dir_name)
 
-    META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/')
-    meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
+        META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/')
+        meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
 
-    for meta in meta_files :
-        FILE_META = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/' + meta)
-        if pathlib.Path(meta).suffix == '.json': 
+        for meta in meta_files :
+            FILE_META = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/' + meta)
+            if pathlib.Path(meta).suffix == '.json': 
 
-            catalog_meta = gh.read_json(FILE_META)
+                catalog_meta = gh.read_json(FILE_META)
 
-            file = catalog_meta['file']
-            data_variables = catalog_meta['catalog_data']
+                file = catalog_meta['file']
+                data_variables = catalog_meta['catalog_data']
 
-            for data in data_variables : 
-                cur_id = data['id']
-                unique_id = file['bucket'] + '_' + file['file_name'].replace(".parquet", "") + '_' + str(cur_id)
-                res = {}
+                for data in data_variables : 
+                    cur_id = data['id']
+                    unique_id = file['bucket'] + '_' + file['file_name'].replace(".parquet", "") + '_' + str(cur_id)
+                    res = {}
 
-                db_input = { 'id' : unique_id, 
-                            'catalog_meta' : catalog_meta, 
-                            'catalog_name' : file['variables'][cur_id - 1]['name'],
-                            'catalog_category' : file['category'],
-                            'time_range' : data['catalog_filters']['frequency'],
-                            'geographic' : ' | '.join(data['catalog_filters']['geographic']),
-                            'dataset_range' : str(data['catalog_filters']['start']) + '_' + str(data['catalog_filters']['end']), 
-                            'data_source' : data['catalog_filters']['data_source']
-                        }
-                
-                res['chart_details'] = {}
-                res['chart_details']['intro'] = ch.format_intro(file['variables'][cur_id - 1])
-                res['chart_details']['intro']['unique_id'] = unique_id
+                    db_input = { 'id' : unique_id, 
+                                'catalog_meta' : catalog_meta, 
+                                'catalog_name' : file['variables'][cur_id - 1]['title_en'] + ' | ' + file['variables'][cur_id - 1]['title_bm'],
+                                'catalog_category' : file['category'],
+                                'time_range' : data['catalog_filters']['frequency'],
+                                'geographic' : ' | '.join(data['catalog_filters']['geographic']),
+                                'dataset_range' : str(data['catalog_filters']['start']) + '_' + str(data['catalog_filters']['end']), 
+                                'data_source' : data['catalog_filters']['data_source']
+                            }
+                    
+                    res['chart_details'] = {}
+                    res['chart_details']['intro'] = ch.format_intro(file['variables'][cur_id - 1])
+                    res['chart_details']['intro']['unique_id'] = unique_id
 
-                res['chart_details']['chart'] = cp.build_chart(file, data)
+                    res['chart_details']['chart'] = cp.build_chart(file, data)
 
-                res['explanation'] = data['metadata_lang'] # Builds the explanations
+                    res['explanation'] = data['metadata_lang'] # Builds the explanations
 
-                res['metadata'] = ch.build_metadata_key(file, data, cur_id)
+                    res['metadata'] = ch.build_metadata_key(file, data, cur_id)
 
-                res['downloads'] = {}
-                res['downloads']['csv'] = file['link_csv']
-                res['downloads']['parquet'] = file['link_parquet']
+                    res['downloads'] = {}
+                    res['downloads']['csv'] = file['link_csv']
+                    res['downloads']['parquet'] = file['link_parquet']
 
-                api_filter = data['chart']['chart_filters']['SLICE_BY'][0]    
-                df = pd.read_parquet(file['link_parquet'])
-                fe_vals = df[api_filter].unique().tolist()
-                be_vals = df[api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
+                    api_filter = data['chart']['chart_filters']['SLICE_BY'][0]    
+                    df = pd.read_parquet(file['link_parquet'])
+                    fe_vals = df[api_filter].unique().tolist()
+                    be_vals = df[api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
 
-                res['API'] = {}
-                res['API']['filter_default'] = be_vals[0]
-                res['API']['mapping'] = dict(zip(fe_vals, be_vals))
-                res['API']['chart_type'] = data['chart']['chart_type']
-                ch.additional_info(file, data, data['chart']['chart_type'], res)
+                    res['API'] = {}
+                    res['API']['filter_default'] = be_vals[0]
+                    res['API']['mapping'] = dict(zip(fe_vals, be_vals))
+                    res['API']['chart_type'] = data['chart']['chart_type']
+                    ch.additional_info(file, data, data['chart']['chart_type'], res)
 
-                db_input['catalog_data'] = res
-                obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
+                    db_input['catalog_data'] = res
+                    obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
+    
