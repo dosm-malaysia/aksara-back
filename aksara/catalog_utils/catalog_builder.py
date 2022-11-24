@@ -1,6 +1,8 @@
 from aksara.catalog_utils import catalog_helper as ch
 from aksara.catalog_utils import general_helper as gh
 from aksara.catalog_utils import chart_picker as cp
+from aksara.catalog_utils.catalog_variable_classes import Timeseries as tm
+
 from aksara.utils import cron_utils
 from aksara.models import CatalogJson
 
@@ -8,7 +10,6 @@ import os
 from os import listdir
 from os.path import isfile, join
 import pathlib
-import pandas as pd
 
 def test_build() :
     try : 
@@ -31,64 +32,24 @@ def test_build() :
                 FILE_META = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/' + meta)
                 if pathlib.Path(meta).suffix == '.json': 
 
-                    catalog_meta = gh.read_json(FILE_META)
+                    data = gh.read_json(FILE_META)
+                    file_data = data['file']
+                    all_variable_data = data['file']['variables']
+                    catalog_data = data['catalog_data']
+                    full_meta = data        
 
-                    file = catalog_meta['file']
-                    data_variables = catalog_meta['catalog_data']
+                    for cur_data in catalog_data :
+                        variable_data = all_variable_data[ cur_data['id'] - 1 ]            
+                        chart_type = cur_data['chart']['chart_type']
+                        obj = []
 
-                    for data in data_variables : 
-                        cur_id = data['id']
-                        unique_id = file['bucket'] + '_' + file['file_name'].replace(".parquet", "") + '_' + str(cur_id)
-                        res = {}
+                        if chart_type == 'TIMESERIES' : 
+                            obj = tm.Timeseries(full_meta, file_data, cur_data, variable_data, all_variable_data)
 
-                        db_input = { 'id' : unique_id, 
-                                    'catalog_meta' : catalog_meta, 
-                                    'catalog_name' : file['variables'][cur_id - 1]['title_en'] + ' | ' + file['variables'][cur_id - 1]['title_bm'],
-                                    'catalog_category' : file['category'],
-                                    'time_range' : data['catalog_filters']['frequency'],
-                                    'geographic' : ' | '.join(data['catalog_filters']['geographic']),
-                                    'dataset_range' : str(data['catalog_filters']['start']) + '_' + str(data['catalog_filters']['end']), 
-                                    'data_source' : data['catalog_filters']['data_source']
-                                }
-                        
-                        res['chart_details'] = {}
-                        res['chart_details']['intro'] = ch.format_intro(file['variables'][cur_id - 1])
-                        res['chart_details']['intro']['unique_id'] = unique_id
+                        db_input = obj.db_input
+                        unique_id = obj.unique_id
 
-                        res['chart_details']['chart'] = cp.build_chart(file, data)
-
-                        res['explanation'] = data['metadata_lang'] # Builds the explanations
-
-                        res['metadata'] = ch.build_metadata_key(file, data, cur_id)
-
-                        res['downloads'] = {}
-                        res['downloads']['csv'] = file['link_csv']
-                        res['downloads']['parquet'] = file['link_parquet']
-
-                        api_filter = data['chart']['chart_filters']['SLICE_BY'][0]    
-                        df = pd.read_parquet(file['link_parquet'])
-                        fe_vals = df[api_filter].unique().tolist()
-                        be_vals = df[api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
-
-                        res['API'] = {}
-                        res['API']['filters'] = []
-                        res['API']['chart_type'] = data['chart']['chart_type']
-                        filter = {
-                            'key' : 'filter',
-                            'default' : {
-                                'label' : fe_vals[0],
-                                'value' : be_vals[0]
-                            },
-                            'options' : [ {'label' : k, 'value' : v} for k, v in dict(zip(fe_vals, be_vals)).items() ]
-                        }
-                        res['API']['filters'].append(filter)
-
-                        # res['API']['filter_default'] = be_vals[0]
-                        # res['API']['mapping'] = dict(zip(fe_vals, be_vals))
-                        ch.additional_info(file, data, data['chart']['chart_type'], res['API']['filters'])
-
-                        db_input['catalog_data'] = res
-                        obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
-                        print(file['variables'][cur_id - 1]['name'] + " : COMPLETED")
+                        db_obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
+                        print(obj.variable_name + " : COMPLETED")
     except Exception as e: 
         print(e)    
