@@ -159,7 +159,7 @@ class GeneralChartsUtil :
         res = {}
         res['API'] = self.api 
         res['explanation'] = self.explanation 
-        res['metadata'] = self.meta_data
+        res['metadata'] = self.metadata
         res['downloads'] = self.downloads
         res['chart_details'] = self.chart_details
 
