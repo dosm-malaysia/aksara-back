@@ -29,5 +29,5 @@ class Migration(migrations.Migration):
                 ('dashboard_name', models.CharField(max_length=200)),
                 ('dashboard_meta', models.JSONField()),
             ],
-        ),
+        ),        
     ]

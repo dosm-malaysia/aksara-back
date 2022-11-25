@@ -26,10 +26,9 @@ env = environ.Env()
 environ.Env.read_env()
 
 '''
-TODO : 
-1. Make sure dataset_range is inclusive of subset years
-2. Make sure to format the new geographic info from meta jsons : STATE | DUN
-3. Make sure filters for data variable includes English and BM
+TODO :
+1. Make sure to format the new geographic info from meta jsons : STATE | DUN
+2. Make sure filters for data variable includes English and BM
 '''
 
 
@@ -77,13 +76,6 @@ def get_filters_applied(param_list) :
             else : 
                 default_params[k] = param_list[k][0].split(',')
     
-    # concatenate begin and end
-    q_date = default_params['begin'] + '_' + default_params['end']
-    default_params.pop('begin', None)
-    default_params.pop('end', None)
-    if q_date != '_' : 
-        default_params['dataset_range'] = q_date
-    
     # Check if period, geographic, source has been set
     if default_params['period'] == '' : 
         default_params.pop('period', None)
@@ -93,6 +85,12 @@ def get_filters_applied(param_list) :
         default_params.pop('source', None)
     if default_params['search'] == '' :
         default_params.pop('search', None)
+    if default_params['begin'] == '' : 
+        default_params.pop('begin', None)
+    if default_params['end'] == '' : 
+        default_params.pop('end', None)        
+
+
 
 
     query = Q()
@@ -109,6 +107,10 @@ def get_filters_applied(param_list) :
             query &= Q(data_source__in=tuple(v))
         elif k == 'search' : 
             query &= Q(catalog_name__icontains=v)
+        if k == 'begin' : 
+            query &= Q(dataset_begin__gte=v)
+        if k == 'end' : 
+            query &= Q(dataset_end__lte=v)
 
     return query
 
