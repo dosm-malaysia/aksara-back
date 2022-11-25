@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from functools import reduce
+from django.db.models import Q
 
 from aksara.utils import cron_utils, triggers
 from aksara.serializers import MetaSerializer, KKMSerializer, CatalogSerializer
@@ -17,6 +19,8 @@ from threading import Thread
 import json
 import os
 import environ
+
+
 
 env = environ.Env()
 environ.Env.read_env()
@@ -55,12 +59,58 @@ class DATA_VARIABLE(APIView):
         else:
             return JsonResponse({}, safe=False)
 
+def get_filters_applied(param_list) : 
+    default_params = {'period' : '', 'geographic' : [], 'begin' : '', 'end' : '', 'source' : []}
+
+    for k, v in default_params.items() : 
+        if k in param_list : 
+            if isinstance(v , str) : # Else get the multi-support
+                default_params[k] = param_list[k][0]
+            else : 
+                default_params[k] = param_list[k][0].split(',')
+    
+    # concatenate begin and end
+    q_date = default_params['begin'] + '_' + default_params['end']
+    default_params.pop('begin', None)
+    default_params.pop('end', None)
+    if q_date != '_' : 
+        default_params['dataset_range'] = q_date
+    
+    # Check if period, geographic, source has been set
+    if default_params['period'] == '' : 
+        default_params.pop('period', None)
+    if default_params['geographic'] == [] : 
+        default_params.pop('geographic', None)
+    if default_params['source'] == [] : 
+        default_params.pop('source', None)
+
+    query = Q()
+
+    for k, v in default_params.items() : 
+        if k == 'period' : 
+            query &= Q(time_range=v)
+        elif k == 'geographic' :         
+            for i in v :
+                query |= Q(geographic__contains=i)
+        elif k == 'dataset_range' : 
+            query &= Q(dataset_range__contains=v)
+        elif k == 'source' : 
+            query &= Q(data_source__in=tuple(v))
+
+    return query
+
+
 class DATA_CATALOG(APIView) :
     def get(self, request, format=None):
         param_list = dict(request.GET)
-        info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')                
+        filters = get_filters_applied(param_list)
+        info = ''
+        if len(filters) > 0 : 
+            info = CatalogJson.objects.filter(filters).values('id', 'catalog_name', 'catalog_category')                            
+        else : 
+            info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')
+        
         res = {}
-
         res['total_all'] = len(info)
         res['dataset'] = {}
 
