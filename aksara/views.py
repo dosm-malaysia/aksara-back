@@ -25,6 +25,14 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
+'''
+TODO : 
+1. Make sure dataset_range is inclusive of subset years
+2. Make sure to format the new geographic info from meta jsons : STATE | DUN
+3. Make sure filters for data variable includes English and BM
+'''
+
+
 class KKMNOW(APIView):
     def post(self, request, format=None):
         if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
@@ -60,7 +68,7 @@ class DATA_VARIABLE(APIView):
             return JsonResponse({}, safe=False)
 
 def get_filters_applied(param_list) : 
-    default_params = {'period' : '', 'geographic' : [], 'begin' : '', 'end' : '', 'source' : []}
+    default_params = {'period' : '', 'geographic' : [], 'begin' : '', 'end' : '', 'source' : [], 'search' : ''}
 
     for k, v in default_params.items() : 
         if k in param_list : 
@@ -83,6 +91,9 @@ def get_filters_applied(param_list) :
         default_params.pop('geographic', None)
     if default_params['source'] == [] : 
         default_params.pop('source', None)
+    if default_params['search'] == '' :
+        default_params.pop('search', None)
+
 
     query = Q()
 
@@ -96,6 +107,8 @@ def get_filters_applied(param_list) :
             query &= Q(dataset_range__contains=v)
         elif k == 'source' : 
             query &= Q(data_source__in=tuple(v))
+        elif k == 'search' : 
+            query &= Q(catalog_name__icontains=v)
 
     return query
 
