@@ -90,9 +90,6 @@ def get_filters_applied(param_list) :
     if default_params['end'] == '' : 
         default_params.pop('end', None)        
 
-
-
-
     query = Q()
 
     for k, v in default_params.items() : 
@@ -108,10 +105,11 @@ def get_filters_applied(param_list) :
         elif k == 'search' : 
             query &= Q(catalog_name__icontains=v)
         if k == 'begin' : 
-            query &= Q(dataset_begin__gte=v)
+            query &= Q(dataset_begin__lte=v)
         if k == 'end' : 
-            query &= Q(dataset_end__lte=v)
-
+            query &= Q(dataset_end__gte=v)
+    
+    print(query)
     return query
 
 

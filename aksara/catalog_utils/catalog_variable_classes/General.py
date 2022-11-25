@@ -149,7 +149,6 @@ class GeneralChartsUtil :
         res['geographic'] = ' | '.join(self.meta_data['catalog_filters']['geographic'])
         res['dataset_begin'] = self.meta_data['catalog_filters']['start']
         res['dataset_end'] = self.meta_data['catalog_filters']['end']
-        # res['dataset_range'] = str( self.meta_data['catalog_filters']['start'] ) + '_' + str( self.meta_data['catalog_filters']['end'] )
         res['data_source'] = self.meta_data['catalog_filters']['data_source']
 
         return res
