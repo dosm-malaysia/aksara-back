@@ -1,5 +1,6 @@
 from aksara.catalog_utils import general_helper as gh
 from aksara.catalog_utils.catalog_variable_classes import Timeseries as tm
+from aksara.catalog_utils.catalog_variable_classes import Choropleth as ch
 
 from aksara.utils import cron_utils
 from aksara.models import CatalogJson
@@ -43,6 +44,8 @@ def test_build() :
 
                         if chart_type == 'TIMESERIES' : 
                             obj = tm.Timeseries(full_meta, file_data, cur_data, variable_data, all_variable_data)
+                        elif chart_type == 'CHOROPLETH' : 
+                            obj = ch.Choropleth(full_meta, file_data, cur_data, variable_data, all_variable_data)
 
                         db_input = obj.db_input
                         unique_id = obj.unique_id

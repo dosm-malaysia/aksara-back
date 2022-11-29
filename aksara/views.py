@@ -27,8 +27,7 @@ environ.Env.read_env()
 
 '''
 TODO :
-1. Make sure to format the new geographic info from meta jsons : STATE | DUN
-2. Make sure filters for data variable includes English and BM
+1. Make sure filters for data variable includes English and BM
 '''
 
 
@@ -65,6 +64,37 @@ class DATA_VARIABLE(APIView):
             return JsonResponse(res, safe=False)
         else:
             return JsonResponse({}, safe=False)
+
+class DATA_CATALOG(APIView) :
+    def get(self, request, format=None):
+        param_list = dict(request.GET)
+        filters = get_filters_applied(param_list)
+        info = ''
+        if len(filters) > 0 : 
+            info = CatalogJson.objects.filter(filters).values('id', 'catalog_name', 'catalog_category')                            
+        else : 
+            info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')
+        
+        res = {}
+        res['total_all'] = len(info)
+        res['dataset'] = {}
+
+        lang = request.query_params.get('lang', 'en')
+        lang_mapping = {'en' : 0, 'bm' : 1}
+
+        if lang not in lang_mapping : 
+            lang = 'en'
+
+        for item in info.iterator():
+            category = item['catalog_category'] 
+            item.pop('catalog_category', None)
+            item['catalog_name'] = item['catalog_name'].split(" | ")[ lang_mapping[lang] ]
+            if category not in res['dataset'] : 
+                res['dataset'][category] = [item]
+            else : 
+                res['dataset'][category].append(item)
+
+        return JsonResponse(res, safe=False)
 
 def get_filters_applied(param_list) : 
     default_params = {'period' : '', 'geographic' : [], 'begin' : '', 'end' : '', 'source' : [], 'search' : ''}
@@ -109,40 +139,7 @@ def get_filters_applied(param_list) :
         if k == 'end' : 
             query &= Q(dataset_end__gte=v)
     
-    print(query)
     return query
-
-
-class DATA_CATALOG(APIView) :
-    def get(self, request, format=None):
-        param_list = dict(request.GET)
-        filters = get_filters_applied(param_list)
-        info = ''
-        if len(filters) > 0 : 
-            info = CatalogJson.objects.filter(filters).values('id', 'catalog_name', 'catalog_category')                            
-        else : 
-            info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')
-        
-        res = {}
-        res['total_all'] = len(info)
-        res['dataset'] = {}
-
-        lang = request.query_params.get('lang', 'en')
-        lang_mapping = {'en' : 0, 'bm' : 1}
-
-        if lang not in lang_mapping : 
-            lang = 'en'
-
-        for item in info.iterator():
-            category = item['catalog_category'] 
-            item.pop('catalog_category', None)
-            item['catalog_name'] = item['catalog_name'].split(" | ")[ lang_mapping[lang] ]
-            if category not in res['dataset'] : 
-                res['dataset'][category] = [item]
-            else : 
-                res['dataset'][category].append(item)
-
-        return JsonResponse(res, safe=False)
 
 def data_variable_chart_handler(data, chart_type, param_list) : 
     if chart_type == 'TIMESERIES' :
@@ -168,6 +165,14 @@ def data_variable_chart_handler(data, chart_type, param_list) :
         intro = data['chart_details']['intro']
 
         return {'chart_data' : chart_data, 'table_data' : table_data, 'intro' : intro}
+    elif chart_type == 'CHOROPLETH' : 
+        if 'filters' not in data['API'] :
+            table_data = {}
+            table_data['columns'] = data['chart_details']['chart']['TABLE']['columns'] 
+            table_data['data'] = data['chart_details']['chart']['TABLE']['data']
+            chart_data = data['chart_details']['chart']['CHART']
+            intro = data['chart_details']['intro']
+            return {'chart_data' : chart_data, 'table_data' : table_data, 'intro' : intro}
 
 
 def data_variable_handler(param_list) :
