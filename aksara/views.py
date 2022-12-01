@@ -173,7 +173,9 @@ def data_variable_chart_handler(data, chart_type, param_list) :
             chart_data = data['chart_details']['chart']['CHART']
             intro = data['chart_details']['intro']
             return {'chart_data' : chart_data, 'table_data' : table_data, 'intro' : intro}
-
+    elif chart_type == 'TABLE' :
+        intro = data['chart_details']['intro']
+        return {'table_data' : data['chart_details']['chart'], 'intro' : intro}
 
 def data_variable_handler(param_list) :
     var_id = param_list["id"][0]
