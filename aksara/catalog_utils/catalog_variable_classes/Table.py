@@ -47,8 +47,9 @@ class Table(GeneralChartsUtil) :
         res['columns'] = {'en' :{}, 'bm' : {}}
 
         for obj in self.all_variable_data[1:] : 
-            res['columns']['en'][ obj['name'] ] = obj['title_en']
-            res['columns']['bm'][ obj['name'] ] = obj['title_bm']
+            if obj['name'] not in self.exclude : 
+                res['columns']['en'][ obj['name'] ] = obj['title_en']
+                res['columns']['bm'][ obj['name'] ] = obj['title_bm']
 
         return res
 
@@ -58,7 +59,13 @@ class Table(GeneralChartsUtil) :
         for i in self.all_variable_data[1:] : 
             i.pop('unique_id', None)
 
-        self.metadata['out_dataset'] = self.all_variable_data[1:]
+        out_data = []
+
+        for obj in self.all_variable_data[1:] : 
+            if obj['name'] not in self.exclude : 
+                out_data.append(obj)
+
+        self.metadata['out_dataset'] = out_data
         return self.metadata
 
     def build_api(self) : 
