@@ -31,7 +31,7 @@ TODO :
 '''
 
 
-class KKMNOW(APIView):
+class DASHBOARD(APIView):
     def post(self, request, format=None):
         if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
             thread = Thread(target=cron_utils.selective_update)

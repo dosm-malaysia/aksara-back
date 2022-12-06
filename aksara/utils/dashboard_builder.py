@@ -9,7 +9,8 @@ into respective chart builders
 
 def build_chart(chart_type, data) :
     variables = data['variables']
-    input_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/' + data['input']
+    # input_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/' + data['input']
+    input_file = data['input']
 
     if chart_type == 'bar_chart':
         return bar_chart(input_file, variables)
@@ -29,5 +30,7 @@ def build_chart(chart_type, data) :
         return helpers_custom(input_file)
     elif chart_type == 'map_lat_lon':  
         return map_lat_lon(input_file, variables)
+    elif chart_type == 'choropleth_chart' : 
+        return choropleth_chart(input_file, variables)
     else:
         return {}

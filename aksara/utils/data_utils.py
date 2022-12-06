@@ -26,8 +26,7 @@ def rebuild_dashboard_meta(operation) :
     if operation == 'REBUILD' : 
         MetaJson.objects.all().delete()
 
-    # TODO : Make META_DIR DYNAMIC
-    META_DIR = os.path.join(os.getcwd(), 'aksara/management/commands/META_JSON/kkmnow/')
+    META_DIR = os.path.join(os.getcwd(), 'aksara/management/commands/META_JSON/')
     meta_files = []
     meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
     failed_builds = []
@@ -52,9 +51,11 @@ def rebuild_dashboard_meta(operation) :
 
     if len(failed_builds) > 0 :
         err_message = triggers.format_multi_line(failed_builds, '--- FAILED META ---') 
-        triggers.send_telegram(err_message)
+        print(err_message)
+        # triggers.send_telegram(err_message)
     else :
-        triggers.send_telegram("META Built Successfully.")
+        print("Meta Built successfully.")
+        # triggers.send_telegram("META Built Successfully.")
 
 
 '''
@@ -76,12 +77,12 @@ def rebuild_dashboard_charts(operation) :
 
     data_as_of_list = {}
 
-    try : 
-        data_as_of_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/metadata_updated_date.json'
-        f = open(data_as_of_file)
-        data_as_of_list = json.load(f)
-    except Exception as e:
-        triggers.send_telegram("----- DATA UPDATE FILES NOT PRESENT -----")
+    # try : 
+    #     data_as_of_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/metadata_updated_date.json'
+    #     f = open(data_as_of_file)
+    #     data_as_of_list = json.load(f)
+    # except Exception as e:
+    #     triggers.send_telegram("----- DATA UPDATE FILES NOT PRESENT -----")
 
     for meta in meta_json_list : 
         dbd_meta = meta['dashboard_meta']
@@ -118,9 +119,11 @@ def rebuild_dashboard_charts(operation) :
 
     if len(failed_builds) > 0 :
         err_message = triggers.format_multi_line(failed_builds, '--- FAILED CHARTS ---') 
-        triggers.send_telegram(err_message)
+        print(err_message)
+        # triggers.send_telegram(err_message)
     else : 
-        triggers.send_telegram("Chart Data Built Successfully.")
+        print("Chart data built successfully")
+        # triggers.send_telegram("Chart Data Built Successfully.")
 
 '''
 Operations to fetch the latest data update

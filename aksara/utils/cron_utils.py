@@ -59,22 +59,22 @@ Performs data operations,
 such as update or rebuild
 '''
 def data_operation(operation) :
-    dir_name = 'KKMNOW_SRC'
-    zip_name = 'repo.zip'
-    git_url = 'https://github.com/MoH-Malaysia/kkmnow-data/archive/main.zip'
-    git_token = os.getenv('GITHUB_TOKEN', '-')
+    # dir_name = 'KKMNOW_SRC'
+    # zip_name = 'repo.zip'
+    # git_url = 'https://github.com/MoH-Malaysia/kkmnow-data/archive/main.zip'
+    # git_token = os.getenv('GITHUB_TOKEN', '-')
 
-    triggers.send_telegram("--- PERFORMING " + operation + " ---")
+    # triggers.send_telegram("--- PERFORMING " + operation + " ---")
 
-    create_directory(dir_name)
-    res = fetch_from_git(zip_name, git_url, git_token)
-    if 'resp_code' in res and res['resp_code'] == 200 : 
-        write_as_binary(res['file_name'], res['data'])
-        extract_zip(res['file_name'], dir_name)
-        data_utils.rebuild_dashboard_meta(operation)
-        data_utils.rebuild_dashboard_charts(operation)
-    else : 
-        triggers.send_telegram("FAILED TO GET SOURCE DATA")
+    # create_directory(dir_name)
+    # res = fetch_from_git(zip_name, git_url, git_token)
+    # if 'resp_code' in res and res['resp_code'] == 200 : 
+        # write_as_binary(res['file_name'], res['data'])
+        # extract_zip(res['file_name'], dir_name)
+    data_utils.rebuild_dashboard_meta(operation)
+    data_utils.rebuild_dashboard_charts(operation)
+    # else : 
+    #     triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 def get_latest_info_git(type, commit_id) : 
     url = "https://api.github.com/repos/MoH-Malaysia/kkmnow-data/commits/main"
