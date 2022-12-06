@@ -151,10 +151,10 @@ def custom_chart(file_name, variables) :
 
     df['data'] = df[ variables['columns'] ].to_dict(orient="records")
     
+    res = {}
+
     df['u_groups'] = list(df[keys].itertuples(index=False, name=None))
     u_groups_list = df['u_groups'].unique().tolist()
-
-    res = {}
 
     for group in u_groups_list : 
         result = {}

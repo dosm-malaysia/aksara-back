@@ -17,8 +17,8 @@
           "line_labour_force_participation" : "p_rate",
           "under_employment_rate" : "under_rate",
           "line_under_employment_rate" : "under_rate",
-          "employment_population_ration" : "ep_ratio",
-          "line_employment_population_ration" : "ep_ratio",
+          "employment_population_ratio" : "ep_ratio",
+          "line_employment_population_ratio" : "ep_ratio",
           "unemployed_persons" : "unemployed",
           "line_unemployed_persons" : "unemployed",
           "own_account_workers" : "own_account", 
@@ -62,6 +62,18 @@
           "cols_list" : ["income_mean", "labour_urate", "labour_prate", "agegroup_working"],
           "area_key" : "state"
       }
-    }      
+    },
+    "statistics": {
+      "name": "statistics",
+      "chart_type": "custom_chart",
+      "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/labour_timeseries_callout.parquet",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "keys": ["chart"],
+        "columns": ["callout1"],
+        "null_vals": null
+      }
+    }
   }
 }
