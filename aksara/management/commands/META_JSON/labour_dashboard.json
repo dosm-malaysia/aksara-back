@@ -12,19 +12,12 @@
       "variables": {
           "x": "date",
           "unemployment_rate": "u_rate",
-          "line_unemployment_rate": "u_rate",
           "labour_force_participation" : "p_rate",
-          "line_labour_force_participation" : "p_rate",
           "under_employment_rate" : "under_rate",
-          "line_under_employment_rate" : "under_rate",
           "employment_population_ratio" : "ep_ratio",
-          "line_employment_population_ratio" : "ep_ratio",
           "unemployed_persons" : "unemployed",
-          "line_unemployed_persons" : "unemployed",
           "own_account_workers" : "own_account", 
-          "line_own_account_workers" : "own_account",
-          "outside_labour_force" : "outside", 
-          "line_outside_labour_force" : "outside"
+          "outside_labour_force" : "outside"
       }
     },
     "bar_chart": {
