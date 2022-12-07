@@ -16,7 +16,7 @@
           "under_employment_rate" : "under_rate",
           "employment_population_ratio" : "ep_ratio",
           "unemployed_persons" : "unemployed",
-          "own_account_workers" : "own_account", 
+          "own_account_workers" : "own_account",
           "outside_labour_force" : "outside"
       }
     },
