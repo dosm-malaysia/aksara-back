@@ -26,6 +26,17 @@
                 "property_other" : "property_other"
             }
         }
-      }
+      },
+      "choropleth_malaysia": {
+        "name": "choropleth_malaysia",
+        "chart_type": "choropleth_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_violerty_choropletha.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "cols_list" : ["violent","property","violent_murder","violent_rape","violent_robbery","violent_injury","property_break_in","property_vehicle_lorry","property_vehicle_motorcar","property_vehicle_motorcycle","property_snatch","property_other"],
+            "area_key" : "state"
+        }
+      }      
     }
 }

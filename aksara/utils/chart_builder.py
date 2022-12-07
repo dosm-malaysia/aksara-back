@@ -120,13 +120,13 @@ def choropleth_chart(file_name, variables) :
     
     cols_list = variables['cols_list']
     area_key = variables['area_key']
-    
+
     if 'state' in df.columns :
         df['state'].replace(STATE_ABBR, inplace=True)
     
     df = df.replace({np.nan: None})
     res = {}
-
+ 
     for col in cols_list :
         to_extract = [area_key , col]
         temp_df = df[ to_extract ].rename(columns={area_key : 'id', col : 'value'})
