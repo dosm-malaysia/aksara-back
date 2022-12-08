@@ -1,0 +1,24 @@
+{
+    "dashboard_name": "iowrt_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/iowrt_timeseries.parquet",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "chart_type" : {
+                "x": "date",
+                "total" : "total",
+                "wholesale" : "wholesale",
+                "retail" : "retail",
+                "motor" : "motor",
+                "recession" : "recession"
+            }
+        }
+      }
+    }
+}
