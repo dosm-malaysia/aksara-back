@@ -22,7 +22,8 @@
                 "mfg_petroleum" : "mfg_petroleum",
                 "mfg_metal" : "mfg_metal",
                 "mfg_electric" : "mfg_electric",
-                "mfg_transport" : "mfg_transport"
+                "mfg_transport" : "mfg_transport",
+                "recession" : "recession"
             }
         }
       },
