@@ -30,7 +30,8 @@
                 "coin_50" : "coin_50",
                 "coin_rm1" : "coin_rm1", 
                 "coin_rm5" : "coin_rm5", 
-                "coin_others" : "coin_others"        
+                "coin_others" : "coin_others",
+                "recession" : "recession"       
             }
         }
       },
