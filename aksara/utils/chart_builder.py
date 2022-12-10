@@ -36,10 +36,12 @@ def bar_chart(file_name, variables) :
         for b in group[::-1]:
             result = {b: result}
         if isinstance(axis_values, list) : 
+            group_l = [group[0]] if len(group) == 1 else list(group)
+            group = group[0] if len(group) == 1 else group
             x_list = df.groupby(keys)[axis_values[0]].get_group(group).to_list()
             y_list = df.groupby(keys)[axis_values[1]].get_group(group).to_list()
             final_d = {'x' : x_list, 'y' : y_list}
-            set_dict(result, list(group), final_d, 'SET')
+            set_dict(result, group_l, final_d, 'SET')
         else :
             final_d = {}
             for k, v in axis_values.items() :
