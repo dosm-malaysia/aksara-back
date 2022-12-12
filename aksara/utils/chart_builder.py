@@ -15,7 +15,7 @@ def bar_chart(file_name, variables) :
         df['state'].replace(STATE_ABBR, inplace=True)
 
     if 'district' in df.columns : # District usually uses has spaces and Uppercase 
-        df['district'] = df['district'].apply(lambda x : x.lower().replace(' ', '-'))
+        df['district'] = df['district'].apply(lambda x : x.lower().replace(' ', '-'))        
     
     # Remove later on!!
     if 'type' in df.columns :  
@@ -64,6 +64,9 @@ def bar_meter(file_name, variables) :
 
     if 'state' in df.columns : 
         df['state'].replace(STATE_ABBR, inplace=True)
+
+    if 'area' in df.columns : # District usually uses has spaces and Uppercase 
+        df['area'] = df['area'].apply(lambda x : x.lower().replace(' ', '_'))
 
     keys = variables['keys']
     axis_values = variables['axis_values']
@@ -419,5 +422,68 @@ def map_lat_lon(file_name, variables) :
         d_values = df.groupby(keys).get_group(group)[values].to_dict(orient='records')
         set_dict(result, list(group), d_values, 'SET')
         merge(res, result)
+
+    return res
+
+'''
+Builds a jitter chart
+'''
+
+def jitter_chart(file_name, variables) :
+    keys = variables['keys']
+    columns = variables['columns']
+    id = variables['id']
+    
+    df = pd.read_parquet(file_name)
+    df = df.replace({np.nan: None})
+    res = {}
+
+    df[keys] = df[keys].apply(lambda x : x.lower().replace(' ', '_'))
+    key_vals = df[ keys ].unique().tolist() # Handles just 1 key ( as of now )
+
+    for k in key_vals : 
+        res[k] = []
+
+        for col in columns :
+            x_val = col + "_x"
+            y_val = col + "_y"
+
+            temp_df = df.groupby(keys).get_group(k)[['area', x_val, y_val]]
+            temp_df = temp_df.rename(columns={x_val : 'x', y_val : 'y', id : 'id'})
+            data = temp_df.to_dict('records')
+            res[k].append( {'key' : col, 'data' : data} )
+
+    return res
+
+'''
+Builds a pyramid chart
+'''
+
+def pyramid_chart(file_name, variables) : 
+    col_range = variables['col_range']
+    suffix = variables['suffix']
+    keys = variables['keys']
+
+    df = pd.read_parquet(file_name)
+    
+    df[keys] = df[keys].apply(lambda x : x.lower().replace(' ', '_'))
+
+    for k, v in col_range.items() :
+        map_rename = {}
+        cols = []
+
+        for i, j in suffix.items() : 
+            col_name = v + i
+            cols.append( col_name ) # Value + suffix
+            map_rename[col_name] = j
+
+        temp_df = df[ cols ]
+        temp_df = temp_df.rename(columns=map_rename)
+        temp_df['id'] = k
+        df[k] = temp_df.to_dict(orient='records')
+
+
+    df['final'] = df[ list(col_range.keys()) ].values.tolist()
+    res = dict([(i,x) for i,x in zip(df[ keys ], df['final'])])
 
     return res

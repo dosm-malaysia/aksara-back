@@ -100,11 +100,14 @@ def rebuild_dashboard_charts(operation) :
                 res = {}
                 res['data'] = dashboard_builder.build_chart(chart_list[k]['chart_type'], c_data)
                 if len(res['data']) > 0 : # If the dict isnt empty
-        
-                    if len(data_as_of_list) > 0 : # If the data update file exists 
-                        data_update_info = get_latest_data_update([dbd_name, chart_name], data_as_of_list)
-                        if data_update_info : 
-                            res['data_as_of'] = data_update_info
+                
+                    if 'data_as_of' in chart_list[k] : 
+                        res['data_as_of']  = chart_list[k]['data_as_of']
+
+                    # if len(data_as_of_list) > 0 : # If the data update file exists 
+                    #     data_update_info = get_latest_data_update([dbd_name, chart_name], data_as_of_list)
+                    #     if data_update_info : 
+                    #         res['data_as_of'] = data_update_info
 
                     updated_values = {'chart_type' : chart_type, 'api_type' : api_type, 'chart_data' : res}
                     obj, created = KKMNowJSON.objects.update_or_create(dashboard_name=dbd_name, chart_name=k, defaults=updated_values)

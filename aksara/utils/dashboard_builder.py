@@ -32,5 +32,9 @@ def build_chart(chart_type, data) :
         return map_lat_lon(input_file, variables)
     elif chart_type == 'choropleth_chart' : 
         return choropleth_chart(input_file, variables)
+    elif chart_type == 'jitter_chart' : 
+        return jitter_chart(input_file, variables)
+    elif chart_type == 'pyramid_chart' : 
+        return pyramid_chart(input_file, variables)
     else:
         return {}

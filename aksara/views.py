@@ -205,7 +205,7 @@ def handle_request(param_list):
     res = {}
     if all(p in param_list for p in params_req):
         data = dbd_info['charts']
-
+        
         if len(data) > 0 :
             for k, v in data.items() :
                 api_type = v['api_type']

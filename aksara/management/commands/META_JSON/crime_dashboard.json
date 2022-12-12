@@ -7,6 +7,7 @@
         "name": "timeseries",
         "chart_type": "timeseries_chart",
         "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_violerty_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
         "api_type": "static",
         "api_params": [],
         "variables": {
@@ -31,6 +32,7 @@
         "name": "choropleth_malaysia",
         "chart_type": "choropleth_chart",
         "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_violerty_choropleth.parquet",
+        "data_as_of" : "2022-11-25 23:59",
         "api_type": "static",
         "api_params": [],
         "variables": {

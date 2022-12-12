@@ -1,12 +1,12 @@
 {
-    "dashboard_name": "iowrt_dashboard",
+    "dashboard_name": "reserves_dashboard",
     "required_params": [],
     "optional_params": [],
     "charts": {
       "timeseries": {
         "name": "timeseries",
         "chart_type": "timeseries_chart",
-        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/iowrt_timeseries.parquet",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/reserves_timeseries.parquet",
         "data_as_of" : "2022-11-25 23:59",
         "api_type": "static",
         "api_params": [],
@@ -14,17 +14,23 @@
             "chart_type" : {
                 "x": "date",
                 "total" : "total",
-                "wholesale" : "wholesale",
-                "retail" : "retail",
-                "motor" : "motor",
-                "recession" : "recession"
+                "currency" : "currency",
+                "reserves_required" : "reserves_required",
+                "reserves_excess" : "reserves_excess",
+                "net_claims_gov" : "net_claims_gov",
+                "claims_gov" : "claims_gov",
+                "deposits_gov" : "deposits_gov",
+                "claims_private" : "claims_private",
+                "external" : "external",
+                "others" : "others",
+                "recession" : "recession"                
             }
         }
       },
       "statistics": {
         "name": "statistics",
         "chart_type": "custom_chart",
-        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/iowrt_timeseries_callout.parquet",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/reserves_timeseries_callout.parquet",
         "data_as_of" : "2022-11-25 23:59",
         "api_type": "static",
         "api_params": [],
