@@ -436,24 +436,29 @@ def jitter_chart(file_name, variables) :
     
     df = pd.read_parquet(file_name)
     df = df.replace({np.nan: None})
+
     res = {}
 
     df[keys] = df[keys].apply(lambda x : x.lower().replace(' ', '_'))
     key_vals = df[ keys ].unique().tolist() # Handles just 1 key ( as of now )
 
     for k in key_vals : 
-        res[k] = []
+        res[k] = {}
 
-        for col in columns :
-            x_val = col + "_x"
-            y_val = col + "_y"
+        for key, val in columns.items() :
+            res[k][key] = []
 
-            temp_df = df.groupby(keys).get_group(k)[['area', x_val, y_val]]
-            temp_df = temp_df.rename(columns={x_val : 'x', y_val : 'y', id : 'id'})
-            data = temp_df.to_dict('records')
-            res[k].append( {'key' : col, 'data' : data} )
+            for col in val : 
+                x_val = col + "_x"
+                y_val = col + "_y"
+
+                temp_df = df.groupby(keys).get_group(k)[['area', x_val, y_val]]
+                temp_df = temp_df.rename(columns={x_val : 'x', y_val : 'y', id : 'id'})
+                data = temp_df.to_dict('records')
+                res[k][key].append( {'key' : col, 'data' : data} )
 
     return res
+
 
 '''
 Builds a pyramid chart
@@ -467,23 +472,15 @@ def pyramid_chart(file_name, variables) :
     df = pd.read_parquet(file_name)
     
     df[keys] = df[keys].apply(lambda x : x.lower().replace(' ', '_'))
+    res = {}
 
-    for k, v in col_range.items() :
-        map_rename = {}
-        cols = []
+    for k in df[keys].unique().tolist() :
+        res[k] = {}
+        res[k]['x'] = list(col_range.keys())        
+        cur_df = df.groupby(keys).get_group(k)
 
-        for i, j in suffix.items() : 
-            col_name = v + i
-            cols.append( col_name ) # Value + suffix
-            map_rename[col_name] = j
-
-        temp_df = df[ cols ]
-        temp_df = temp_df.rename(columns=map_rename)
-        temp_df['id'] = k
-        df[k] = temp_df.to_dict(orient='records')
-
-
-    df['final'] = df[ list(col_range.keys()) ].values.tolist()
-    res = dict([(i,x) for i,x in zip(df[ keys ], df['final'])])
+        for s, v in suffix.items() :
+            s_values = [ i + s for i in list(col_range.values()) ]
+            res[k][v] = cur_df[s_values].values.tolist()[0]
 
     return res
