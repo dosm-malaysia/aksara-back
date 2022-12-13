@@ -47,7 +47,7 @@
                 "70-74" : "age_70_74",
                 "75-79" : "age_75_79",
                 "80-84" : "age_80_84",
-                "85+" : "age_85_above"    
+                "85-above" : "age_85_above"    
             },
             "suffix" : {"_male" : "male", "_female" : "female"},
             "keys" : "area"            
