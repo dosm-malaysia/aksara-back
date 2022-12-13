@@ -41,6 +41,26 @@
           "columns": ["callout"],
           "null_vals": null
         }
-      }      
+      },
+      "table_summary": {
+        "name": "table_summary",
+        "chart_type": "snapshot_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/moneymeasures_table_summary.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "main_key": "type",
+          "replace_word": "",
+          "null_vals": null,
+          "data": {
+            "data": [
+              "m1",
+              "m2",
+              "m3"
+            ]
+          }
+        }
+      }
     }
 }
