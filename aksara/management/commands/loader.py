@@ -20,6 +20,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         operation =  kwargs['operation'][0]
 
+        if len(kwargs['operation']) > 1 : 
+            files = kwargs['operation'][1]
+            operation = operation + " " + files
+
         '''
         OPERATIONS : 
         1. UPDATE

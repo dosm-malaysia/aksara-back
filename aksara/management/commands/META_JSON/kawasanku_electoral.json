@@ -1,0 +1,117 @@
+{
+    "dashboard_name": "kawasanku_electoral",
+    "required_params": [
+      "area",
+      "area-type"
+    ],
+    "optional_params": [],
+    "charts": {
+      "jitter_chart": {
+        "name": "jitter_chart",
+        "chart_type": "jitter_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/kawasanku_electoral_jitter.parquet",
+        "data_as_of": "2022-11-25 23:59",
+        "api_type": "dynamic",
+        "api_params": [
+          "area-type"
+        ],
+        "variables": {
+          "keys": "area_type",
+          "id": "area",
+          "columns": {
+            "geography": [
+              "total_area",
+              "max_elevation",
+              "ruggedness",
+              "watercover",
+              "treecover",
+              "treeloss",
+              "nightlights"
+            ],
+            "population": [
+              "population_density",
+              "female_male",
+              "household_size",
+              "birth_rate",
+              "death_rate",
+              "dep_young",
+              "dep_old"
+            ],
+            "economy": [
+              "income_mean",
+              "expenditure_mean",
+              "gini",
+              "poverty",
+              "labour_urate",
+              "labour_prate",
+              "agegroup_working"
+            ],
+            "public_services": [
+              "electricity",
+              "water",
+              "hospital",
+              "clinic",
+              "school",
+              "police_fire",
+              "grocery"
+            ]
+          }
+        }
+      },
+      "pyramid_chart": {
+        "name": "pyramid_chart",
+        "chart_type": "pyramid_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/kawasanku_electoral_pyramid.parquet?ignoreCache=1",
+        "data_as_of": "2022-11-25 23:59",
+        "api_type": "dynamic",
+        "api_params": [
+          "area"
+        ],
+        "variables": {
+          "col_range": {
+            "18-20": "age_18_20",
+            "21-29": "age_21_29",
+            "30-39": "age_30_39",
+            "40-49": "age_40_49",
+            "50-59": "age_50_59",
+            "60-69": "age_60_69",
+            "70-79": "age_70_79",
+            "80-89": "age_80_89",
+            "90-above": "age_90+"
+          },
+          "suffix": {
+            "_male": "male",
+            "_female": "female"
+          },
+          "keys": "area"
+        }
+      },
+      "bar_chart": {
+        "name": "bar_chart",
+        "chart_type": "bar_meter",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/kawasanku_electoral_barmeter.parquet",
+        "data_as_of": "2022-11-25 23:59",
+        "api_type": "dynamic",
+        "api_params": [
+          "area"
+        ],
+        "variables": {
+          "axis_values": [
+            {
+              "variable": "value"
+            }
+          ],
+          "keys": [
+            "area",
+            "chart"
+          ],
+          "null_vals": null,
+          "add_key": {},
+          "wanted": [],
+          "id_needed": false,
+          "condition": {},
+          "post_operation": ""
+        }
+      }
+    }
+  }

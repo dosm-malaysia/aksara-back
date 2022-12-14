@@ -23,12 +23,20 @@ HOW IT WORKS :
 '''
 
 def rebuild_dashboard_meta(operation) :
+    opr_data = get_operation_files(operation)
+    operation = opr_data['operation']
+    meta_files = opr_data['files']
+
     if operation == 'REBUILD' : 
         MetaJson.objects.all().delete()
 
     META_DIR = os.path.join(os.getcwd(), 'aksara/management/commands/META_JSON/')
-    meta_files = []
-    meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
+    
+    if not meta_files : 
+        meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
+    else : 
+        meta_files = [f + ".json" for f in meta_files ]
+    
     failed_builds = []
 
     for meta in meta_files : 
@@ -69,20 +77,20 @@ HOW IT WORKS :
 '''
 
 def rebuild_dashboard_charts(operation) :
+    opr_data = get_operation_files(operation)
+    operation = opr_data['operation']
+    meta_files = opr_data['files']    
+    meta_json_list = []
+
     if operation == 'REBUILD' : 
         KKMNowJSON.objects.all().delete()
     
-    meta_json_list = MetaJson.objects.values()
+    if meta_files : 
+        meta_json_list = MetaJson.objects.filter(dashboard_name__in=meta_files).values()
+    else : 
+        meta_json_list = MetaJson.objects.values()
+
     failed_builds = []
-
-    data_as_of_list = {}
-
-    # try : 
-    #     data_as_of_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/metadata_updated_date.json'
-    #     f = open(data_as_of_file)
-    #     data_as_of_list = json.load(f)
-    # except Exception as e:
-    #     triggers.send_telegram("----- DATA UPDATE FILES NOT PRESENT -----")
 
     for meta in meta_json_list : 
         dbd_meta = meta['dashboard_meta']
@@ -103,11 +111,6 @@ def rebuild_dashboard_charts(operation) :
                 
                     if 'data_as_of' in chart_list[k] : 
                         res['data_as_of']  = chart_list[k]['data_as_of']
-
-                    # if len(data_as_of_list) > 0 : # If the data update file exists 
-                    #     data_update_info = get_latest_data_update([dbd_name, chart_name], data_as_of_list)
-                    #     if data_update_info : 
-                    #         res['data_as_of'] = data_update_info
 
                     updated_values = {'chart_type' : chart_type, 'api_type' : api_type, 'chart_data' : res}
                     obj, created = KKMNowJSON.objects.update_or_create(dashboard_name=dbd_name, chart_name=k, defaults=updated_values)
@@ -141,6 +144,18 @@ def get_latest_data_update(arr, data) :
             break
     
     return data
+
+
+def get_operation_files(operation) :
+    opr = operation.split(" ")
+    chosen_opr = opr[0]
+    files = []
+
+    if len(opr) > 1 : 
+        files = opr[1].split(",")
+
+    return {"operation" : chosen_opr, "files" : files} 
+
 
 
 def rebuild_selective_update(changed_files) :
