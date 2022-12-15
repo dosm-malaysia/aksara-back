@@ -1,0 +1,48 @@
+{
+    "dashboard_name": "drug_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_drugs_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "state" : {
+                "x": "date",
+                "total" : "total",
+                "male" : "male",
+                "female" : "female"
+            }
+        }
+      },
+      "bar_chart": {
+        "name": "bar_chart",
+        "chart_type": "bar_meter",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_drugs_barmeter.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "axis_values": [
+            {
+              "variable": "value"
+            }
+          ],
+          "keys": [
+            "state",
+            "chart"
+          ],
+          "null_vals": null,
+          "add_key": {},
+          "wanted": [],
+          "id_needed": false,
+          "condition": {},
+          "post_operation": ""
+        }
+      }          
+    }
+}

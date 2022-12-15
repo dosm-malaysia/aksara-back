@@ -1,0 +1,40 @@
+{
+    "dashboard_name": "mei_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/mei_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "chart_type" : {
+                "x": "date",
+                "leading" : "leading",
+                "coincident" : "coincident",
+                "lagging" : "lagging",
+                "leading_diffusion" : "leading_diffusion",
+                "coincident_diffusion" : "coincident_diffusion",
+                "flag_recession_business" : "flag_recession_business",
+                "flag_recession_growth" : "flag_recession_growth"
+            }
+        }
+      },
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/mei_timeseries_callout.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": ["chart_type"],
+          "columns": ["callout1", "callout2", "callout3"],
+          "null_vals": null
+        }
+      }      
+    }
+}

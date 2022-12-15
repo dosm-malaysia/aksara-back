@@ -1,0 +1,76 @@
+{
+  "dashboard_name": "labour_dashboard",
+  "required_params": [],
+  "optional_params": [],
+  "charts": {
+    "timeseries": {
+      "name": "timeseries",
+      "chart_type": "timeseries_chart",
+      "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/labour_timeseries.parquet",
+      "data_as_of" : "2022-11-25 23:59",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+          "x": "date",
+          "unemployment_rate": "u_rate",
+          "labour_force_participation" : "p_rate",
+          "under_employment_rate" : "under_rate",
+          "employment_population_ratio" : "ep_ratio",
+          "unemployed_persons" : "unemployed",
+          "own_account_workers" : "own_account",
+          "outside_labour_force" : "outside"
+      }
+    },
+    "bar_chart": {
+      "name": "bar_chart",
+      "chart_type": "bar_meter",
+      "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/labour_barmeter.parquet",
+      "data_as_of" : "2022-11-25 23:59",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "axis_values": [
+          {
+            "variable": "value"
+          }
+        ],
+        "keys": [
+          "chart"
+        ],
+        "null_vals": null,
+        "add_key": {
+          "value_tooltip": "tooltip"
+        },
+        "wanted": [],
+        "id_needed": false,
+        "condition": {},
+        "post_operation": ""
+      }
+    },
+    "choropleth_malaysia": {
+      "name": "choropleth_malaysia",
+      "chart_type": "choropleth_chart",
+      "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/labour_choropleth.parquet",
+      "data_as_of" : "2022-11-25 23:59",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+          "cols_list" : ["income_mean", "labour_urate", "labour_prate", "agegroup_working"],
+          "area_key" : "state"
+      }
+    },
+    "statistics": {
+      "name": "statistics",
+      "chart_type": "custom_chart",
+      "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/labour_timeseries_callout.parquet",
+      "data_as_of" : "2022-11-25 23:59",
+      "api_type": "static",
+      "api_params": [],
+      "variables": {
+        "keys": ["chart"],
+        "columns": ["callout1"],
+        "null_vals": null
+      }
+    }
+  }
+}

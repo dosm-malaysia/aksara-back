@@ -1,4 +1,5 @@
 from django.contrib import admin
-# import models here
+from .models import MetaJson, KKMNowJSON
 
-# register models here
+admin.site.register(MetaJson)
+admin.site.register(KKMNowJSON)

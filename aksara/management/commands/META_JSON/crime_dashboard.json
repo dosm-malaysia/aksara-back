@@ -1,0 +1,44 @@
+{
+    "dashboard_name": "crime_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_violerty_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "state" : {
+                "x": "date",
+                "violent" : "violent",
+                "property" : "property",
+                "violent_murder" : "violent_murder",
+                "violent_rape" : "violent_rape",
+                "violent_robbery" : "violent_robbery",
+                "violent_injury" : "violent_injury",
+                "property_break_in" : "property_break_in",
+                "property_vehicle_lorry" : "property_vehicle_lorry",
+                "property_vehicle_motorcar" : "property_vehicle_motorcar",
+                "property_vehicle_motorcycle" : "property_vehicle_motorcycle",
+                "property_snatch" : "property_snatch",
+                "property_other" : "property_other"
+            }
+        }
+      },
+      "choropleth_malaysia": {
+        "name": "choropleth_malaysia",
+        "chart_type": "choropleth_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/crime_violerty_choropleth.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "cols_list" : ["violent","property","violent_murder","violent_rape","violent_robbery","violent_injury","property_break_in","property_vehicle_lorry","property_vehicle_motorcar","property_vehicle_motorcycle","property_snatch","property_other"],
+            "area_key" : "state"
+        }
+      }      
+    }
+}

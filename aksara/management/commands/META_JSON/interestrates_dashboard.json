@@ -1,0 +1,48 @@
+{
+    "dashboard_name": "interestrates_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/interestrates_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "x": "date",
+            "deposit_fixed_12mo" : "deposit_fixed_12mo",
+            "deposit_saving" : "deposit_saving",
+            "base" : "base",
+            "walr" : "walr",
+            "recession" : "recession"
+        }
+      },
+      "timeseries_opr": {
+        "name": "timeseries_opr",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/interestrates_timeseries_opr.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "x": "date",
+            "opr" : "opr"
+        }
+      },
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/interestrates_timeseries_callout.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": ["chart"],
+          "columns": ["callout"],
+          "null_vals": null
+        }
+      }      
+    }
+}

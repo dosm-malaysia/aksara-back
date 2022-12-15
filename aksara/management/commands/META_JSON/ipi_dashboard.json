@@ -1,0 +1,45 @@
+{
+    "dashboard_name": "ipi_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/ipi_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "chart_type" : {
+                "x": "date",
+                "overall" : "overall",
+                "mining" : "mining",
+                "mfg" : "mfg",
+                "electric" : "electric",
+                "mfg_food" : "mfg_food",
+                "mfg_textiles" : "mfg_textiles",
+                "mfg_wood" : "mfg_wood",
+                "mfg_petroleum" : "mfg_petroleum",
+                "mfg_metal" : "mfg_metal",
+                "mfg_electric" : "mfg_electric",
+                "mfg_transport" : "mfg_transport",
+                "recession" : "recession"
+            }
+        }
+      },
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/ipi_timeseries_callout.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": ["chart_type", "chart"],
+          "columns": ["callout"],
+          "null_vals": null
+        }
+      }      
+    }
+}

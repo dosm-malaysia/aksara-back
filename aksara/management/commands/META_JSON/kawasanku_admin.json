@@ -1,0 +1,82 @@
+{
+    "dashboard_name": "kawasanku_admin",
+    "required_params": ["area", "area-type"],
+    "optional_params": [],
+    "charts": {
+      "jitter_chart" :  {
+        "name": "jitter_chart",
+        "chart_type": "jitter_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/kawasanku_admin_jitter.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "dynamic",
+        "api_params": ["area-type"],
+        "variables": {
+            "keys" : "area_type",
+            "id" : "area",
+            "columns" : {
+              "geography" : ["total_area", "max_elevation", "ruggedness", "watercover", "treecover", "treeloss", "nightlights"],
+              "population" : ["population_density", "female_male", "household_size", "birth_rate", "death_rate", "dep_young", "dep_old"],
+              "economy" : ["income_mean", "expenditure_mean", "gini", "poverty", "labour_urate", "labour_prate", "agegroup_working"],
+              "public_services" : ["electricity", "water", "hospital", "clinic", "school", "police_fire", "grocery"]
+            }
+        }
+      },
+      "pyramid_chart" : {
+        "name": "pyramid_chart",
+        "chart_type": "pyramid_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/kawasanku_admin_pyramid.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "dynamic",
+        "api_params": ["area"],
+        "variables": {
+            "col_range" : {
+                "0-4" : "age_0_4", 
+                "5-9" : "age_5_9",
+                "10-14" : "age_10_14",
+                "15-19" : "age_15_19",
+                "20-24" : "age_20_24",
+                "25-29" : "age_25_29",
+                "30-34" : "age_30_34",
+                "35-39" : "age_35_39",
+                "40-44" : "age_40_44",
+                "45-49" : "age_45_49",
+                "50-54" : "age_50_54",
+                "55-59" : "age_55_59",
+                "60-64" : "age_60_64",
+                "65-69" : "age_65_69",
+                "70-74" : "age_70_74",
+                "75-79" : "age_75_79",
+                "80-84" : "age_80_84",
+                "85-above" : "age_85_above"    
+            },
+            "suffix" : {"_male" : "male", "_female" : "female"},
+            "keys" : "area"            
+        }
+      },
+      "bar_chart": {
+        "name": "bar_chart",
+        "chart_type": "bar_meter",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/kawasanku_admin_barmeter.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "dynamic",
+        "api_params": ["area"],
+        "variables": {
+          "axis_values": [
+            {
+              "variable": "value"
+            }
+          ],
+          "keys": [
+            "area",
+            "chart"
+          ],
+          "null_vals": null,
+          "add_key": {},
+          "wanted": [],
+          "id_needed": false,
+          "condition": {},
+          "post_operation": ""
+        }
+      }
+    }
+  }

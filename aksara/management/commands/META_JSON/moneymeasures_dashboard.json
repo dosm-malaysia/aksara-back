@@ -1,0 +1,66 @@
+{
+    "dashboard_name": "moneymeasures_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/moneymeasures_timeseries.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "chart_type" : {
+                "x": "date",
+                "m1_total" : "m1_total",
+                "m2_total" : "m2_total",
+                "m3_total" : "m3_total",
+                "m1_currency" : "m1_currency",
+                "m1_deposit_demand" : "m1_deposit_demand",
+                "m2_deposit_saving" : "m2_deposit_saving",
+                "m2_deposit_fixed" : "m2_deposit_fixed",
+                "m2_nid" : "m2_nid",
+                "m2_repo" : "m2_repo",
+                "m2_deposit_fx" : "m2_deposit_fx",
+                "m2_deposit_other" : "m2_deposit_other",
+                "m3_deposit_other" : "m3_deposit_other",
+                "recession" : "recession"                         
+            }
+        }
+      },
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/moneymeasures_timeseries_callout.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": ["chart_type", "chart"],
+          "columns": ["callout"],
+          "null_vals": null
+        }
+      },
+      "table_summary": {
+        "name": "table_summary",
+        "chart_type": "snapshot_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/moneymeasures_table_summary.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "main_key": "type",
+          "replace_word": "",
+          "null_vals": null,
+          "data": {
+            "data": [
+              "m1",
+              "m2",
+              "m3"
+            ]
+          }
+        }
+      }
+    }
+}

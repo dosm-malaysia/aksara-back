@@ -1,0 +1,77 @@
+{
+    "dashboard_name": "currency_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/currency_timeseries.parquet??ignoreCache=1",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "chart_type" : {
+                "x": "date",
+                "total" : "total", 
+                "note_1" : "note_1", 
+                "note_2" : "note_2", 
+                "note_5" : "note_5", 
+                "note_10" : "note_10",
+                "note_20" : "note_20", 
+                "note_50" : "note_50", 
+                "note_100" : "note_100", 
+                "note_500" : "note_500", 
+                "note_1000" : "note_1000",
+                "note_others" : "note_others", 
+                "coin_1" : "coin_1", 
+                "coin_5" : "coin_5", 
+                "coin_10" : "coin_10", 
+                "coin_20" : "coin_20", 
+                "coin_50" : "coin_50",
+                "coin_rm1" : "coin_rm1", 
+                "coin_rm5" : "coin_rm5", 
+                "coin_others" : "coin_others",
+                "recession" : "recession"       
+            }
+        }
+      },
+      "bar_chart": {
+        "name": "bar_chart",
+        "chart_type": "bar_meter",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/currency_barmeter.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "axis_values": [
+            {
+              "variable": "value"
+            }
+          ],
+          "keys": [
+            "chart"
+          ],
+          "null_vals": null,
+          "add_key": {},
+          "wanted": [],
+          "id_needed": false,
+          "condition": {},
+          "post_operation": ""
+        }
+      },      
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/currency_timeseries_callout.parquet??ignoreCache=1",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": ["chart_type", "chart"],
+          "columns": ["callout"],
+          "null_vals": null
+        }
+      }           
+    }
+  }

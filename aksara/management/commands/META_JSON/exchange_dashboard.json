@@ -1,0 +1,76 @@
+{
+    "dashboard_name": "exchange_dashboard",
+    "required_params": [],
+    "optional_params": [],
+    "charts": {
+      "timeseries": {
+        "name": "timeseries",
+        "chart_type": "timeseries_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/er_timeseries.parquet?ignoreCache=1",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+            "chart" : {
+                "x": "date",
+                "currency0" : "currency0",
+                "currency1" : "currency1",
+                "currency2" : "currency2",
+                "currency3" : "currency3",
+                "currency4" : "currency4",
+                "currency5" : "currency5",
+                "currency6" : "currency6",
+                "currency7" : "currency7",
+                "currency8" : "currency8",
+                "currency9" : "currency9",
+                "currency10" : "currency10",
+                "currency11" : "currency11",
+                "currency12" : "currency12",
+                "currency13" : "currency13",
+                "currency14" : "currency14",
+                "currency15" : "currency15",
+                "currency16" : "currency16",
+                "currency17" : "currency17",
+                "currency18" : "currency18",
+                "currency19" : "currency19",
+                "currency20" : "currency20",
+                "currency21" : "currency21",
+                "currency22" : "currency22",
+                "currency23" : "currency23",
+                "currency24" : "currency24"
+                                       
+            }
+        }
+      },      
+      "statistics": {
+        "name": "statistics",
+        "chart_type": "custom_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/er_timeseries_callout.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": ["chart"],
+          "columns": ["callout","country_en","country_bm","tooltip_unit","chart_flag"],
+          "null_vals": null
+        }
+      },
+      "bar_chart": {
+        "name": "bar_chart",
+        "chart_type": "bar_chart",
+        "chart_source": "https://storage.googleapis.com/dosm-public-dashboards/er_barchart.parquet",
+        "data_as_of" : "2022-11-25 23:59",
+        "api_type": "static",
+        "api_params": [],
+        "variables": {
+          "keys": [
+            "period"
+          ],
+          "axis_values": [
+            "country",
+            "pct_change"
+          ]
+        }
+      }                 
+    }
+  }
