@@ -96,6 +96,10 @@ class DATA_CATALOG(APIView) :
 
         return JsonResponse(res, safe=False)
 
+
+'''
+Checks which filters have been applied for the data-catalog
+'''
 def get_filters_applied(param_list) : 
     default_params = {'period' : '', 'geographic' : [], 'begin' : '', 'end' : '', 'source' : [], 'search' : ''}
 
@@ -141,6 +145,9 @@ def get_filters_applied(param_list) :
     
     return query
 
+'''
+Handles the data-variable queries, by chart applied
+'''
 def data_variable_chart_handler(data, chart_type, param_list) : 
     if chart_type == 'TIMESERIES' :
         filter = ''
@@ -177,6 +184,9 @@ def data_variable_chart_handler(data, chart_type, param_list) :
         intro = data['chart_details']['intro']
         return {'table_data' : data['chart_details']['chart'], 'intro' : intro}
 
+'''
+General handler for data-variables
+'''
 def data_variable_handler(param_list) :
     var_id = param_list["id"][0]
     info = CatalogJson.objects.filter(id=var_id).values('catalog_data')
@@ -189,6 +199,9 @@ def data_variable_handler(param_list) :
         return {}
     return info
 
+'''
+Handles request for dashboards
+'''
 def handle_request(param_list):
     dbd_name = str(param_list["dashboard"][0])
     dbd_info = cache.get("META_" + dbd_name)
