@@ -30,17 +30,16 @@ TODO :
 1. Make sure filters for data variable includes English and BM
 '''
 
+class UPDATE(APIView) : 
+    def post(self, request, format=None):
+        # if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
+        thread = Thread(target=cron_utils.selective_update)
+        thread.start()
+        return Response(status=status.HTTP_200_OK)
+        
+        # return JsonResponse({'status':401,'message':"unauthorized"}, status=401)
 
 class DASHBOARD(APIView):
-    def post(self, request, format=None):
-        if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
-            thread = Thread(target=cron_utils.selective_update)
-            thread.start()
-            return Response(status=status.HTTP_200_OK)
-        
-        return JsonResponse({'status':401,'message':"unauthorized"}, status=401)
-
-
     def get(self, request, format=None):
         # if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
         #     return JsonResponse({'status': 401,'message':"unauthorized"}, status=401)

@@ -30,7 +30,7 @@ def rebuild_dashboard_meta(operation) :
     if operation == 'REBUILD' : 
         MetaJson.objects.all().delete()
 
-    META_DIR = os.path.join(os.getcwd(), 'aksara/management/commands/META_JSON/')
+    META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/dashboards/')
     
     if not meta_files : 
         meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
@@ -41,7 +41,7 @@ def rebuild_dashboard_meta(operation) :
 
     for meta in meta_files : 
         try : 
-            f_meta = META_DIR + meta
+            f_meta = META_DIR + meta             
             f = open(f_meta)
             data = json.load(f)
             dbd_name = meta.replace(".json", "")
@@ -155,8 +155,6 @@ def get_operation_files(operation) :
         files = opr[1].split(",")
 
     return {"operation" : chosen_opr, "files" : files} 
-
-
 
 def rebuild_selective_update(changed_files) :
     failed_notify = {}
