@@ -433,6 +433,7 @@ def jitter_chart(file_name, variables) :
     keys = variables['keys']
     columns = variables['columns']
     id = variables['id']
+    tooltip = variables['tooltip']
     
     df = pd.read_parquet(file_name)
     df = df.replace({np.nan: None})
@@ -452,8 +453,16 @@ def jitter_chart(file_name, variables) :
                 x_val = col + "_x"
                 y_val = col + "_y"
 
-                temp_df = df.groupby(keys).get_group(k)[['area', x_val, y_val]]
-                temp_df = temp_df.rename(columns={x_val : 'x', y_val : 'y', id : 'id'})
+                cols_rename = {x_val : 'x', y_val : 'y', id : 'id'} 
+                cols_inv = ['area', x_val, y_val]
+
+                if tooltip :
+                    t_val = col + "_t"
+                    cols_rename[t_val] = 'tooltip'
+                    cols_inv.append(t_val)
+
+                temp_df = df.groupby(keys).get_group(k)[cols_inv]
+                temp_df = temp_df.rename(columns=cols_rename)
                 data = temp_df.to_dict('records')
                 res[k][key].append( {'key' : col, 'data' : data} )
 
