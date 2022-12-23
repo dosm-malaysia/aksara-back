@@ -35,7 +35,11 @@ class Timeseries(GeneralChartsUtil) :
     def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data):
         GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data)
 
-        self.api_filter = meta_data['chart']['chart_filters']['SLICE_BY'][0]
+        if meta_data['chart']['chart_filters']['SLICE_BY'] : 
+            self.api_filter = meta_data['chart']['chart_filters']['SLICE_BY'][0]
+        else :
+            self.api_filter = []
+
         self.frequency = meta_data['catalog_filters']['frequency']
         self.applicable_frequency = self.get_range_values()
         self.api = self.build_api_info()
@@ -54,25 +58,31 @@ class Timeseries(GeneralChartsUtil) :
     def build_chart(self) :
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
-
+        
         for key in self.t_keys : 
             df[key] = df[key].apply(lambda x : x.lower().replace(' ', '-'))
+
         df['date'] = pd.to_datetime(df['date'])
 
-        df['u_groups'] = list(df[self.t_keys].itertuples(index=False, name=None))
-        u_groups_list = df['u_groups'].unique().tolist()
+        if self.t_keys : 
+            df['u_groups'] = list(df[self.t_keys].itertuples(index=False, name=None))
+            u_groups_list = df['u_groups'].unique().tolist()
 
-        res = {}
+            res = {}
 
-        for group in u_groups_list : 
-            result = {}
-            for b in group[::-1]:
-                result = {b: result}
-            cur_group = group[0] if len(group) == 1 else group
-            cur_data = self.slice_timeline(df, cur_group)
-            self.set_dict(result, list(group), cur_data)
-            merge(res, result)
-        return res
+            for group in u_groups_list : 
+                result = {}
+                for b in group[::-1]:
+                    result = {b: result}
+                cur_group = group[0] if len(group) == 1 else group
+                cur_data = self.slice_timeline(df, cur_group)
+                self.set_dict(result, list(group), cur_data)
+                merge(res, result)
+
+            return res
+        else :
+            res = self.slice_timeline(df, '')
+            return res
 
     '''
     Slice the timeseries based on conditions of the frequency of when data is updated
@@ -92,7 +102,7 @@ class Timeseries(GeneralChartsUtil) :
                 range_df = range_df[(range_df.date >= start_date) & (range_df.date <= last_date)]
 
             if range in self.group_time : 
-                key_list_mod = self.t_keys[:]
+                key_list_mod = self.t_keys[:] if self.t_keys else []
                 key_list_mod.append('interval')
                 range_df["interval"] = range_df["date"].dt.to_period( self.group_time[range] ).dt.to_timestamp()
                 range_df['interval'] = range_df['interval'].values.astype(np.int64) // 10 ** 6
@@ -105,20 +115,35 @@ class Timeseries(GeneralChartsUtil) :
                 elif self.t_operation == 'MEDIAN' : 
                     new_temp_df = range_df.groupby(key_list_mod, as_index=False)[ self.t_format['y'] ].median()
 
-                res[range]['x'] = new_temp_df.groupby(self.t_keys)['interval'].get_group( cur_group ).to_list()
-                res[range]['y'] = new_temp_df.groupby(self.t_keys)[ self.t_format['y'] ].get_group( cur_group ).to_list()
-                
+                if self.t_keys :
+                    res[range]['x'] = new_temp_df.groupby(self.t_keys)['interval'].get_group( cur_group ).to_list()
+                    res[range]['y'] = new_temp_df.groupby(self.t_keys)[ self.t_format['y'] ].get_group( cur_group ).to_list()
+                else : 
+                    res[range]['x'] = new_temp_df['interval'].to_list()
+                    res[range]['y'] = new_temp_df[ self.t_format['y'] ].to_list()
+
                 res['TABLE']['data'][range] = self.build_variable_table(res[range]['x'], res[range]['y'])
                 
                 if 'line' in self.t_format : 
-                    res[range]['line'] = new_temp_df.groupby(self.t_keys)[ self.t_format['y'] ].get_group( cur_group ).to_list()
+                    if self.t_keys :
+                        res[range]['line'] = new_temp_df.groupby(self.t_keys)[ self.t_format['y'] ].get_group( cur_group ).to_list()
+                    else : 
+                        res[range]['line'] = new_temp_df[ self.t_format['y'] ].to_list()
             else : 
                 range_df['date'] = range_df['date'].values.astype(np.int64) // 10 ** 6
-                res[range]['x'] = range_df.groupby(self.t_keys)['date'].get_group( cur_group ).to_list()
-                res[range]['y'] = range_df.groupby(self.t_keys)[ self.t_format['y'] ].get_group( cur_group ).to_list()
-                dma_col = self.t_format['y'] if self.t_format['line'] == '' else self.t_format['line']
-                res['TABLE']['data'][range] = self.build_variable_table(res[range]['x'], res[range]['y'])
-                res[range]['line'] = range_df.groupby(self.t_keys)[dma_col].get_group( cur_group ).rolling(window=7).mean().replace({np.nan: None}).to_list()             
+                
+                if self.t_keys :                 
+                    res[range]['x'] = range_df.groupby(self.t_keys)['date'].get_group( cur_group ).to_list()
+                    res[range]['y'] = range_df.groupby(self.t_keys)[ self.t_format['y'] ].get_group( cur_group ).to_list()
+                    dma_col = self.t_format['y'] if self.t_format['line'] == '' else self.t_format['line']
+                    res['TABLE']['data'][range] = self.build_variable_table(res[range]['x'], res[range]['y'])
+                    res[range]['line'] = range_df.groupby(self.t_keys)[dma_col].get_group( cur_group ).rolling(window=7).mean().replace({np.nan: None}).to_list()             
+                else : 
+                    res[range]['x'] = range_df['date'].to_list()
+                    res[range]['y'] = range_df[ self.t_format['y'] ].to_list()
+                    dma_col = self.t_format['y'] if self.t_format['line'] == '' else self.t_format['line']
+                    res['TABLE']['data'][range] = self.build_variable_table(res[range]['x'], res[range]['y'])
+                    res[range]['line'] = range_df[dma_col].rolling(window=7).mean().replace({np.nan: None}).to_list()
         return res
 
     '''
@@ -136,15 +161,20 @@ class Timeseries(GeneralChartsUtil) :
         res = {}
 
         df = pd.read_parquet(self.read_from)
-        fe_vals = df[self.api_filter].unique().tolist()
-        be_vals = df[self.api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
-        range_options = [ {'label' : self.timeseries_values[r], 'value' : r} for r in self.applicable_frequency ]
+        api_filters_inc = []
 
-        filter_obj = self.build_api_object_filter('filter', fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals)))
+        if self.api_filter : 
+            fe_vals = df[self.api_filter].unique().tolist()
+            be_vals = df[self.api_filter].apply(lambda x : x.lower().replace(' ', '-')).unique().tolist()
+            filter_obj = self.build_api_object_filter('filter', fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals)))
+            api_filters_inc.append(filter_obj)
+        
+        range_options = [ {'label' : self.timeseries_values[r], 'value' : r} for r in self.applicable_frequency ]        
         range_obj = self.build_api_object_filter('range', self.timeseries_values[ self.frequency ], self.frequency, range_options)
+        api_filters_inc.append(range_obj)
 
         res['API'] = {}
-        res['API']['filters'] = [filter_obj, range_obj]
+        res['API']['filters'] = api_filters_inc
         res['API']['chart_type'] = self.meta_data['chart']['chart_type']
 
         return res['API']
