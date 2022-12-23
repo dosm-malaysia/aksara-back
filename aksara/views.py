@@ -165,10 +165,17 @@ def data_variable_chart_handler(data, chart_type, param_list) :
             range =  param_list['range'][0]
 
         table_data = {}
-        table_data['columns'] = data['chart_details']['chart'][filter]['TABLE']['columns'] 
-        table_data['data'] = data['chart_details']['chart'][filter]['TABLE']['data'][range]
-        chart_data = data['chart_details']['chart'][filter][range]
-        intro = data['chart_details']['intro']
+
+        if filter :
+            table_data['columns'] = data['chart_details']['chart'][filter]['TABLE']['columns'] 
+            table_data['data'] = data['chart_details']['chart'][filter]['TABLE']['data'][range]
+            chart_data = data['chart_details']['chart'][filter][range]
+            intro = data['chart_details']['intro']
+        else :
+            table_data['columns'] = data['chart_details']['chart']['TABLE']['columns'] 
+            table_data['data'] = data['chart_details']['chart']['TABLE']['data'][range]
+            chart_data = data['chart_details']['chart'][range]
+            intro = data['chart_details']['intro']       
 
         return {'chart_data' : chart_data, 'table_data' : table_data, 'intro' : intro}
     elif chart_type == 'CHOROPLETH' : 
@@ -191,7 +198,7 @@ def data_variable_handler(param_list) :
     info = CatalogJson.objects.filter(id=var_id).values('catalog_data')
     info = info[0]['catalog_data']
     chart_type = info['API']['chart_type']
-    
+
     info['chart_details'] = data_variable_chart_handler(info, chart_type, param_list)
 
     if len(info) == 0 : 
