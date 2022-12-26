@@ -6,6 +6,9 @@ from aksara.utils import triggers
 from aksara.utils import data_utils
 from aksara.utils import common
 from aksara.catalog_utils import catalog_builder
+
+from aksara.models import CatalogJson
+
 import requests
 import zipfile
 import json
@@ -122,12 +125,29 @@ def selective_update() :
             data_utils.rebuild_dashboard_meta(operation, "AUTO")
             data_utils.rebuild_dashboard_charts(operation, "AUTO")            
             # Get the failed or successful builds here, to validate
+        else : 
+            META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/dashboards/')
+            distinct_db_files = set(MetaJson.objects.order_by().values_list('dashboard_name', flat=True).distinct())
+            distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
+            remove_files = list(distinct_db_files - distinct_src_files)
+
+        if remove_files : 
+            MetaJson.objects.filter(file_src__in=remove_files).delete()
+
 
         if filtered_changes['catalog'] : 
             fin_files = [ x.replace(".json", "") for x in filtered_changes['catalog']]
             file_list = ",".join(fin_files)
             operation = "UPDATE " + file_list  
             catalog_builder.catalog_update(operation, "AUTO")
+        else : # Remove files which were removed
+            META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/catalog/')
+            distinct_db_files = set(CatalogJson.objects.order_by().values_list('file_src', flat=True).distinct())
+            distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
+            remove_files = list(distinct_db_files - distinct_src_files)
+
+            if remove_files : 
+                CatalogJson.objects.filter(file_src__in=remove_files).delete()            
 
 
     #     validate_info = data_utils.rebuild_selective_update(changed_files)

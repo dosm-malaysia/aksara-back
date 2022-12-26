@@ -31,16 +31,6 @@ def rebuild_dashboard_meta(operation, op_method) :
 
     if operation == 'REBUILD' : 
         MetaJson.objects.all().delete()
-    else : 
-        distinct_db_files = set(MetaJson.objects.order_by().values_list('dashboard_name', flat=True).distinct())
-        distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
-        remove_files = list(distinct_db_files - distinct_src_files)
-
-        if remove_files : 
-            MetaJson.objects.filter(file_src__in=remove_files).delete()
-
-    if op_method == 'AUTO' and len(meta_files) == 0 : 
-        return 0
 
     if not meta_files : 
         meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
@@ -94,9 +84,6 @@ def rebuild_dashboard_charts(operation, op_method) :
 
     if operation == 'REBUILD' : 
         KKMNowJSON.objects.all().delete()
-    
-    if op_method == 'AUTO' and len(meta_files) == 0 : 
-        return 0
 
     if meta_files : 
         meta_json_list = MetaJson.objects.filter(dashboard_name__in=meta_files).values()

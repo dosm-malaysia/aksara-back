@@ -21,16 +21,6 @@ def catalog_update(operation, op_method) :
 
         if operation == 'REBUILD' : 
             CatalogJson.objects.all().delete()
-        else : 
-            distinct_db_files = set(CatalogJson.objects.order_by().values_list('file_src', flat=True).distinct())
-            distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
-            remove_files = list(distinct_db_files - distinct_src_files)
-
-            if remove_files : 
-                CatalogJson.objects.filter(file_src__in=remove_files).delete()            
-        
-        if op_method == 'AUTO' and len(meta_files) == 0 : 
-            return 0
 
         if not meta_files : 
             meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
