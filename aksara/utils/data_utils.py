@@ -22,7 +22,7 @@ HOW IT WORKS :
 
 '''
 
-def rebuild_dashboard_meta(operation) :
+def rebuild_dashboard_meta(operation, op_method) :
     opr_data = get_operation_files(operation)
     operation = opr_data['operation']
     meta_files = opr_data['files']
@@ -38,6 +38,9 @@ def rebuild_dashboard_meta(operation) :
 
         if remove_files : 
             MetaJson.objects.filter(file_src__in=remove_files).delete()
+
+    if op_method == 'AUTO' and len(meta_files) == 0 : 
+        return 0
 
     if not meta_files : 
         meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
@@ -83,7 +86,7 @@ HOW IT WORKS :
 
 '''
 
-def rebuild_dashboard_charts(operation) :
+def rebuild_dashboard_charts(operation, op_method) :
     opr_data = get_operation_files(operation)
     operation = opr_data['operation']
     meta_files = opr_data['files']    
@@ -92,6 +95,9 @@ def rebuild_dashboard_charts(operation) :
     if operation == 'REBUILD' : 
         KKMNowJSON.objects.all().delete()
     
+    if op_method == 'AUTO' and len(meta_files) == 0 : 
+        return 0
+
     if meta_files : 
         meta_json_list = MetaJson.objects.filter(dashboard_name__in=meta_files).values()
     else : 

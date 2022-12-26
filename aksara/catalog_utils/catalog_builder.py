@@ -11,7 +11,7 @@ from os import listdir
 from os.path import isfile, join
 import pathlib
 
-def catalog_update(operation) :
+def catalog_update(operation, op_method) :
     try : 
         opr_data = data_utils.get_operation_files(operation)
         operation = opr_data['operation']
@@ -29,6 +29,9 @@ def catalog_update(operation) :
             if remove_files : 
                 CatalogJson.objects.filter(file_src__in=remove_files).delete()            
         
+        if op_method == 'AUTO' and len(meta_files) == 0 : 
+            return 0
+
         if not meta_files : 
             meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
         else : 
@@ -66,7 +69,7 @@ def catalog_update(operation) :
     except Exception as e: 
         print(e)    
 
-def catalog_operation(operation) :
+def catalog_operation(operation, op_method) :
     try : 
         dir_name = 'AKSARA_SRC'
         zip_name = 'repo.zip'
@@ -79,6 +82,6 @@ def catalog_operation(operation) :
         if 'resp_code' in res and res['resp_code'] == 200 : 
             cron_utils.write_as_binary(res['file_name'], res['data'])
             cron_utils.extract_zip(res['file_name'], dir_name)
-            catalog_update(operation)
+            catalog_update(operation, op_method)
     except Exception as e: 
         print(e)    

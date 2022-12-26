@@ -59,7 +59,7 @@ def extract_zip(file_name, dir_name) :
 Performs data operations,
 such as update or rebuild
 '''
-def data_operation(operation) :
+def data_operation(operation, op_method) :
     dir_name = 'AKSARA_SRC'
     zip_name = 'repo.zip'
     git_url = 'https://github.com/dosm-malaysia/aksara-data/archive/main.zip'
@@ -72,8 +72,8 @@ def data_operation(operation) :
     if 'resp_code' in res and res['resp_code'] == 200 : 
         write_as_binary(res['file_name'], res['data'])
         extract_zip(res['file_name'], dir_name)
-        data_utils.rebuild_dashboard_meta(operation)
-        data_utils.rebuild_dashboard_charts(operation)
+        data_utils.rebuild_dashboard_meta(operation, op_method)
+        data_utils.rebuild_dashboard_charts(operation, op_method)
     # else : 
     #     triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
@@ -119,15 +119,15 @@ def selective_update() :
             file_list = ",".join(fin_files)
 
             operation = "UPDATE " + file_list
-            data_utils.rebuild_dashboard_meta(operation)
-            data_utils.rebuild_dashboard_charts(operation)            
+            data_utils.rebuild_dashboard_meta(operation, "AUTO")
+            data_utils.rebuild_dashboard_charts(operation, "AUTO")            
             # Get the failed or successful builds here, to validate
 
         if filtered_changes['catalog'] : 
             fin_files = [ x.replace(".json", "") for x in filtered_changes['catalog']]
             file_list = ",".join(fin_files)
             operation = "UPDATE " + file_list  
-            catalog_builder.catalog_update(operation)
+            catalog_builder.catalog_update(operation, "AUTO")
 
 
     #     validate_info = data_utils.rebuild_selective_update(changed_files)
