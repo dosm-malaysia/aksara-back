@@ -23,4 +23,5 @@ class CatalogJson(models.Model) :
     dataset_end = models.IntegerField(default=0)
     data_source = models.CharField(max_length=100)
     catalog_data = models.JSONField()
+    file_src = models.CharField(max_length=400, default='')
      

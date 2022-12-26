@@ -23,8 +23,8 @@ class Choropleth(GeneralChartsUtil) :
     '''
     Initiailize the neccessary data for a Choropleth chart
     '''
-    def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data):
-        GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data)
+    def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src):
+        GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src)
 
         self.c_color = self.meta_data['chart']['chart_variables']['color']
         self.c_file_json = self.meta_data['chart']['chart_variables']['file_json'] 

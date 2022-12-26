@@ -5,6 +5,7 @@ class GeneralChartsUtil :
     variable_data = {}
     full_meta = {}
     all_variable_data = []
+    file_src = ''
     
     # Identifiers
     unique_id = ''
@@ -26,13 +27,14 @@ class GeneralChartsUtil :
     '''
     Initiailize the general information for a catalog variable
     '''
-    def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data) :
+    def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src) :
         self.file_data = file_data
         self.meta_data = meta_data
         self.variable_data = variable_data
         self.all_variable_data = all_variable_data
         self.full_meta = full_meta
         self.read_from  = file_data['link_parquet']
+        self.file_src = file_src
 
         self.cur_id = meta_data['id']
         self.unique_id = file_data['bucket'] + '_' + file_data['file_name'].replace(".parquet", "") + '_' + str(self.cur_id)
@@ -150,6 +152,7 @@ class GeneralChartsUtil :
         res['dataset_begin'] = self.meta_data['catalog_filters']['start']
         res['dataset_end'] = self.meta_data['catalog_filters']['end']
         res['data_source'] = self.meta_data['catalog_filters']['data_source']
+        res['file_src'] = self.file_src
 
         return res
 

@@ -17,10 +17,17 @@ def catalog_update(operation) :
         operation = opr_data['operation']
         meta_files = opr_data['files']
 
+        META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/catalog/')
+
         if operation == 'REBUILD' : 
             CatalogJson.objects.all().delete()
+        else : 
+            distinct_db_files = set(CatalogJson.objects.order_by().values_list('file_src', flat=True).distinct())
+            distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
+            remove_files = list(distinct_db_files - distinct_src_files)
 
-        META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/catalog/')
+            if remove_files : 
+                CatalogJson.objects.filter(file_src__in=remove_files).delete()            
         
         if not meta_files : 
             meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
@@ -35,7 +42,8 @@ def catalog_update(operation) :
                 file_data = data['file']
                 all_variable_data = data['file']['variables']
                 catalog_data = data['catalog_data']
-                full_meta = data        
+                full_meta = data
+                file_src = meta.replace('.json', '') 
 
                 for cur_data in catalog_data :
                     chart_type = cur_data['chart']['chart_type']
@@ -43,12 +51,12 @@ def catalog_update(operation) :
                     variable_data = all_variable_data[ cur_data['id'] - 1 ]
 
                     if chart_type == 'TIMESERIES' :
-                        obj = tm.Timeseries(full_meta, file_data, cur_data, variable_data, all_variable_data)
+                        obj = tm.Timeseries(full_meta, file_data, cur_data, variable_data, all_variable_data, file_src)
                     elif chart_type == 'CHOROPLETH' : 
-                        obj = ch.Choropleth(full_meta, file_data, cur_data, variable_data, all_variable_data)
+                        obj = ch.Choropleth(full_meta, file_data, cur_data, variable_data, all_variable_data, file_src)
                     elif chart_type == 'TABLE' : 
                         variable_data = all_variable_data[0]
-                        obj = tb.Table(full_meta, file_data, cur_data, variable_data, all_variable_data)
+                        obj = tb.Table(full_meta, file_data, cur_data, variable_data, all_variable_data, file_src)
 
                     db_input = obj.db_input
                     unique_id = obj.unique_id

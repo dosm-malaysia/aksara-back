@@ -32,8 +32,8 @@ class Timeseries(GeneralChartsUtil) :
     '''
     Initiailize the neccessary data for a timeseries chart
     '''
-    def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data):
-        GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data)
+    def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src):
+        GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src)
 
         if meta_data['chart']['chart_filters']['SLICE_BY'] : 
             self.api_filter = meta_data['chart']['chart_filters']['SLICE_BY'][0]

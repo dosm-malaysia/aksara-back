@@ -27,11 +27,18 @@ def rebuild_dashboard_meta(operation) :
     operation = opr_data['operation']
     meta_files = opr_data['files']
 
+    META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/dashboards/')
+
     if operation == 'REBUILD' : 
         MetaJson.objects.all().delete()
+    else : 
+        distinct_db_files = set(MetaJson.objects.order_by().values_list('dashboard_name', flat=True).distinct())
+        distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
+        remove_files = list(distinct_db_files - distinct_src_files)
 
-    META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/dashboards/')
-    
+        if remove_files : 
+            MetaJson.objects.filter(file_src__in=remove_files).delete()
+
     if not meta_files : 
         meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
     else : 
@@ -144,7 +151,6 @@ def get_latest_data_update(arr, data) :
             break
     
     return data
-
 
 def get_operation_files(operation) :
     opr = operation.split(" ")

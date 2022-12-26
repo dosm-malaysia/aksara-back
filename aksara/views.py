@@ -13,6 +13,7 @@ from django.db.models import Q
 from aksara.utils import cron_utils, triggers
 from aksara.serializers import MetaSerializer, KKMSerializer, CatalogSerializer
 from aksara.models import MetaJson, KKMNowJSON, CatalogJson
+from aksara.api_handling import handle
 
 from threading import Thread
 
@@ -49,6 +50,7 @@ class DASHBOARD(APIView):
 
         if all(p in param_list for p in params_req):
             res = handle_request(param_list)
+            res = handle.dashboard_additional_handling(param_list, res)
             return JsonResponse(res, safe=False)
         else:
             return JsonResponse({}, safe=False)
