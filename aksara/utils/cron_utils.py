@@ -68,7 +68,7 @@ def data_operation(operation, op_method) :
     git_url = 'https://github.com/dosm-malaysia/aksara-data/archive/main.zip'
     git_token = os.getenv('GITHUB_TOKEN', '-')
 
-    # triggers.send_telegram("--- PERFORMING " + operation + " ---")
+    triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
 
     create_directory(dir_name)
     res = fetch_from_git(zip_name, git_url, git_token)
@@ -77,8 +77,8 @@ def data_operation(operation, op_method) :
         extract_zip(res['file_name'], dir_name)
         data_utils.rebuild_dashboard_meta(operation, op_method)
         data_utils.rebuild_dashboard_charts(operation, op_method)
-    # else : 
-    #     triggers.send_telegram("FAILED TO GET SOURCE DATA")
+    else : 
+        triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 def get_latest_info_git(type, commit_id) : 
     url = "https://api.github.com/repos/dosm-malaysia/aksara-data/commits/main"
@@ -104,7 +104,7 @@ def selective_update() :
     git_url = 'https://github.com/dosm-malaysia/aksara-data/archive/main.zip'
     git_token = os.getenv('GITHUB_TOKEN', '-')
 
-    # triggers.send_telegram("--- PERFORMING SELECTIVE UPDATE ---")
+    triggers.send_telegram("--- PERFORMING SELECTIVE UPDATE ---")
 
     create_directory(dir_name)
     res = fetch_from_git(zip_name, git_url, git_token)
@@ -117,51 +117,44 @@ def selective_update() :
         changed_files = [ f['filename'] for f in data['files']]  
         filtered_changes  = filter_changed_files(changed_files)
         
+        if filtered_changes['dashboards_deleted'] : 
+            remove_files = [ x.replace(".json", "") for x in filtered_changes['dashboards_deleted']]
+            if remove_files : 
+                MetaJson.objects.filter(file_src__in=remove_files).delete()
+
+        if filtered_changes['catalog_deleted'] :
+            remove_files = [ x.replace(".json", "") for x in filtered_changes['catalog_deleted']]
+            if remove_files : 
+                CatalogJson.objects.filter(file_src__in=remove_files).delete()
+
+
         if filtered_changes['dashboards'] : 
             fin_files = [ x.replace(".json", "") for x in filtered_changes['dashboards']]
             file_list = ",".join(fin_files)
 
             operation = "UPDATE " + file_list
             data_utils.rebuild_dashboard_meta(operation, "AUTO")
-            data_utils.rebuild_dashboard_charts(operation, "AUTO")            
-            # Get the failed or successful builds here, to validate
-        else : 
-            META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/dashboards/')
-            distinct_db_files = set(MetaJson.objects.order_by().values_list('dashboard_name', flat=True).distinct())
-            distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
-            remove_files = list(distinct_db_files - distinct_src_files)
-
-        if remove_files : 
-            MetaJson.objects.filter(file_src__in=remove_files).delete()
-
+            validate_info = data_utils.rebuild_dashboard_charts(operation, "AUTO")            
+            
+            dashboards_validate = validate_info['dashboard_list']
+            failed_dashboards = validate_info['failed_dashboards']            
+            
+            # Validate each dashboard
+            for dbd in dashboards_validate : 
+                if dbd not in failed_dashboards : 
+                    revalidate_frontend(dbd)
+                else : 
+                    print("Validation for " + dbd + " : " + " not sent.")
+                    triggers.send_telegram("Validation for " + dbd + " : " + " not sent.")
 
         if filtered_changes['catalog'] : 
             fin_files = [ x.replace(".json", "") for x in filtered_changes['catalog']]
             file_list = ",".join(fin_files)
             operation = "UPDATE " + file_list  
             catalog_builder.catalog_update(operation, "AUTO")
-        else : # Remove files which were removed
-            META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/catalog/')
-            distinct_db_files = set(CatalogJson.objects.order_by().values_list('file_src', flat=True).distinct())
-            distinct_src_files = set([f.replace('.json', '') for f in listdir(META_DIR) if isfile(join(META_DIR, f))])
-            remove_files = list(distinct_db_files - distinct_src_files)
 
-            if remove_files : 
-                CatalogJson.objects.filter(file_src__in=remove_files).delete()            
-
-
-    #     validate_info = data_utils.rebuild_selective_update(changed_files)
-    #     dashboards_validate = validate_info['dashboard_list']
-    #     failed_dashboards = validate_info['failed_dashboards']
-        
-    #     for dbd in dashboards_validate : 
-    #         if dbd not in failed_dashboards : 
-    #             revalidate_frontend(dbd)
-    #         else : 
-    #             triggers.send_telegram("Validation for " + dbd + " : " + " not sent.")
-
-    # else : 
-    #     triggers.send_telegram("FAILED TO GET SOURCE DATA")
+    else :
+        triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 
 '''
@@ -173,8 +166,11 @@ def filter_changed_files(file_list) :
     for f in file_list :
         f_path = "AKSARA_SRC/aksara-data-main/" + f
         f_info = f.split("/")
-        if len(f_info) > 1 and f_info[0] in changed_files and os.path.exists(f_path): 
-            changed_files[ f_info[0] ].append(f_info[1])
+        if len(f_info) > 1 and f_info[0] in changed_files : 
+            if os.path.exists(f_path) : 
+                changed_files[ f_info[0] ].append(f_info[1])
+            else : 
+                changed_files[ f_info[0] + '_deleted'].append(f_info[1])
 
     return changed_files
 

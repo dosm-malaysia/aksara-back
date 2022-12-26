@@ -60,10 +60,10 @@ def rebuild_dashboard_meta(operation, op_method) :
     if len(failed_builds) > 0 :
         err_message = triggers.format_multi_line(failed_builds, '--- FAILED META ---') 
         print(err_message)
-        # triggers.send_telegram(err_message)
+        triggers.send_telegram(err_message)
     else :
         print("Meta Built successfully.")
-        # triggers.send_telegram("META Built Successfully.")
+        triggers.send_telegram("META Built Successfully.")
 
 
 '''
@@ -82,6 +82,10 @@ def rebuild_dashboard_charts(operation, op_method) :
     meta_files = opr_data['files']    
     meta_json_list = []
 
+    dashboard_list = set()
+    failed_notify = {}
+
+
     if operation == 'REBUILD' : 
         KKMNowJSON.objects.all().delete()
 
@@ -96,6 +100,8 @@ def rebuild_dashboard_charts(operation, op_method) :
         dbd_meta = meta['dashboard_meta']
         dbd_name = meta['dashboard_name']
         chart_list = dbd_meta['charts']
+
+        dashboard_list.add(dbd_name)
 
         for k in chart_list.keys() :
             chart_name = k
@@ -117,6 +123,7 @@ def rebuild_dashboard_charts(operation, op_method) :
                     obj.save()
                     cache.set(dbd_name + "_" + k, res)
             except Exception as e:
+                failed_notify[meta] = False
                 failed_obj = {}
                 failed_obj['CHART_NAME'] = chart_name
                 failed_obj['DASHBOARD'] = dbd_name
@@ -125,11 +132,17 @@ def rebuild_dashboard_charts(operation, op_method) :
 
     if len(failed_builds) > 0 :
         err_message = triggers.format_multi_line(failed_builds, '--- FAILED CHARTS ---') 
-        print(err_message)
-        # triggers.send_telegram(err_message)
+        triggers.send_telegram(err_message)
     else : 
         print("Chart data built successfully")
-        # triggers.send_telegram("Chart Data Built Successfully.")
+        triggers.send_telegram("Chart Data Built Successfully.")
+
+    validate_info = {}
+    validate_info['dashboard_list'] = dashboard_list 
+    validate_info['failed_dashboards'] = failed_notify
+
+    return validate_info
+    
 
 '''
 Operations to fetch the latest data update
@@ -154,65 +167,3 @@ def get_operation_files(operation) :
         files = opr[1].split(",")
 
     return {"operation" : chosen_opr, "files" : files} 
-
-def rebuild_selective_update(changed_files) :
-    failed_notify = {}
-
-    if len(changed_files) > 0 :
- 
-        dashboard_list = set()
-        data_as_of_list = {}
-        failed_builds = []
-
-        try : 
-            data_as_of_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/metadata_updated_date.json'
-            f = open(data_as_of_file)
-            data_as_of_list = json.load(f)
-        except Exception as e:
-            triggers.send_telegram("----- DATA UPDATE FILES NOT PRESENT -----")
-
-        for f in changed_files :
-            meta_file = f.split('_')[0]
-            if meta_file in common.FILE_NAME_CONVENTIONS : 
-                dashboard_list.update( common.FILE_NAME_CONVENTIONS[ meta_file ] ) 
-
-        for meta in dashboard_list : 
-            meta_info = MetaJson.objects.filter(dashboard_name=meta).values('dashboard_meta')[0]['dashboard_meta']
-            
-            for k, v in meta_info['charts'].items() : 
-                if v['chart_source'] in changed_files :
-                    c_data = {}
-                    c_data['variables'] = v['variables']
-                    c_data['input'] = v['chart_source']
-
-                    try:
-                        res = {}
-                        res['data'] = dashboard_builder.build_chart(v['chart_type'], c_data)
-                        if len(res['data']) > 0 :
-                            if len(data_as_of_list) > 0 : 
-                                data_update_info = get_latest_data_update([meta, v['name']], data_as_of_list)
-                                if data_update_info : 
-                                    res['data_as_of'] = data_update_info
-                            updated_values = {'chart_type' : v['chart_type'], 'api_type' : v['api_type'], 'chart_data' : res}
-                            obj, created = KKMNowJSON.objects.update_or_create(dashboard_name=meta, chart_name=k, defaults=updated_values)
-                            obj.save()
-                            cache.set(meta + "_" + k, res)
-                    except Exception as e:
-                        failed_notify[meta] = False
-                        failed_obj = {}
-                        failed_obj['CHART_NAME'] = k
-                        failed_obj['DASHBOARD'] = meta
-                        failed_obj['ERROR'] = str(e)
-                        failed_builds.append(failed_obj)
-        
-        if len(failed_builds) > 0 :
-            err_message = triggers.format_multi_line(failed_builds, '--- FAILED CHARTS ---') 
-            triggers.send_telegram(err_message)
-        else : 
-            triggers.send_telegram("Chart Data Built Successfully.")
-
-        validate_info = {}
-        validate_info['dashboard_list'] = dashboard_list 
-        validate_info['failed_dashboards'] = failed_notify
-
-        return validate_info

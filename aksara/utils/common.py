@@ -1,22 +1,16 @@
-FILE_NAME_CONVENTIONS = {
-    'blood' : ['blood_donation'],
-    'bedutil' : ['bed_util'],
-    'covidepid' : ['covid_epid'],
-    'covidnow' : ['covid_now'],
-    'covidvax' : ['covid_vax'],
-    'facilities' : ['facilities', 'facilities_table'],
-    'organ' : ['organ_donation'],
-    'pekab40' : ['peka_b40']
-}
-
 FRONTEND_ENDPOINTS = {
-    'covid_epid' : 'COVID',
-    'covid_vax' : 'COVID_VAX',
-    'blood_donation' : 'BLOOD_DONATION',
-    'organ_donation' : 'ORGAN_DONATION',
-    'peka_b40' : 'PEKA_B40',
-    'facilities' : 'FACILITIES',
-    'facilities_table' : 'FACILITIES',
-    'bed_util' : 'HOSPITAL_BED',
-    'covid_now' : 'COVIDNOW_DATA'
+    'kawasanku_admin' : 'KAWASANKU',
+    'kawasanku_electoral' : 'KAWASANKU',
+    'labour_dashboard' : 'LABOUR_MARKET',
+    'reserves_dashboard' : 'RESERVE_MONEY',
+    'interestrates_dashboard' : 'INTEREST_RATES',
+    'crime_dashboard' : 'CRIME',
+    'drug_dashboard' : 'DRUG',    
+    'rubber_dashboard' : 'RUBBER',
+    'currency_dashboard' : 'CURRENCY_IN_CIRCULATION',
+    'exchange_dashboard' : 'EXCHANGE_RATE',
+    'ipi_dashboard' : 'INDUSTRIAL_PRODUCTION',
+    'iowrt_dashboard' : 'WHOLESALE_RETAIL',
+    'mei_dashboard' : 'COMPOSITE_INDEX',
+    'money_measures_dashboard' : 'MONEY_SUPPLY'
 }
