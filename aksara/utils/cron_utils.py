@@ -179,6 +179,9 @@ def filter_changed_files(file_list) :
 Revalidate Frontend
 '''
 def revalidate_frontend(dashboard) :
+    if dashboard not in common.FRONTEND_ENDPOINTS :
+        return -1
+
     endpoint = common.FRONTEND_ENDPOINTS[dashboard]
     url = os.getenv('FRONTEND_URL', '-')
     fe_auth = os.getenv('FRONTEND_REBUILD_AUTH', '-')

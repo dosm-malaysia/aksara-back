@@ -35,7 +35,7 @@ class Timeseries(GeneralChartsUtil) :
     def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src):
         GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src)
 
-        # self.validate_meta_json()
+        self.validate_meta_json()
 
         if meta_data['chart']['chart_filters']['SLICE_BY'] : 
             self.api_filter = meta_data['chart']['chart_filters']['SLICE_BY'][0]
@@ -196,7 +196,7 @@ class Timeseries(GeneralChartsUtil) :
         self.validate_data_type(s, src, self.meta_data)
 
         self.validate_field_presence(["frequency", "geographic", "start", "end", "data_source"], src, self.meta_data['catalog_filters'])
-        s = {"str" : ["frequency", "start", "end"], "list" : ["geographic", "data_source"]}
+        s = {"str" : ["frequency"], "list" : ["geographic", "data_source"]}
         self.validate_data_type(s, src, self.meta_data['catalog_filters'])
 
         self.validate_field_presence(["data_as_of", "last_updated", "next_update"], src, self.meta_data['metadata_neutral'])

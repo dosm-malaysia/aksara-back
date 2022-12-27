@@ -155,8 +155,8 @@ class GeneralChartsUtil :
         res['catalog_subcategory_name'] = self.file_data['subcategory_en'] + ' | ' + self.file_data['subcategory_bm']
         res['time_range'] = self.meta_data['catalog_filters']['frequency']
         res['geographic'] = ' | '.join(self.meta_data['catalog_filters']['geographic'])
-        res['dataset_begin'] = self.meta_data['catalog_filters']['start']
-        res['dataset_end'] = self.meta_data['catalog_filters']['end']
+        res['dataset_begin'] = int(self.meta_data['catalog_filters']['start'])
+        res['dataset_end'] = int(self.meta_data['catalog_filters']['end'])
         res['data_source'] = ' | '.join(self.meta_data['catalog_filters']['data_source'])
 
         res['file_src'] = self.file_src

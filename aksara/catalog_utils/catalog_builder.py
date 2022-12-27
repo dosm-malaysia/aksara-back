@@ -57,7 +57,7 @@ def catalog_update(operation, op_method) :
                         db_obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
                         triggers.send_telegram(obj.variable_name + " : COMPLETED")
             except Exception as e: 
-                triggers.send_telegram(e)    
+                triggers.send_telegram(str(e))    
 
 def catalog_operation(operation, op_method) :
     try : 

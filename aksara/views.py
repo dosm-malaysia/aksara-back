@@ -87,7 +87,6 @@ class DATA_CATALOG(APIView) :
             lang = 'en'
 
         for item in info.iterator():
-            print(item)
             category = item['catalog_category_name'].split(" | ")[ lang_mapping[lang] ]            
             sub_category = item['catalog_subcategory_name'].split(" | ")[ lang_mapping[lang] ]
             
