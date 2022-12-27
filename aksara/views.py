@@ -72,9 +72,9 @@ class DATA_CATALOG(APIView) :
         filters = get_filters_applied(param_list)
         info = ''
         if len(filters) > 0 : 
-            info = CatalogJson.objects.filter(filters).values('id', 'catalog_name', 'catalog_category')                            
+            info = CatalogJson.objects.filter(filters).values('id', 'catalog_name', 'catalog_category', 'catalog_category_name', 'catalog_subcategory_name')                            
         else : 
-            info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category')
+            info = CatalogJson.objects.all().values('id', 'catalog_name', 'catalog_category', 'catalog_category_name', 'catalog_subcategory_name')
         
         res = {}
         res['total_all'] = len(info)
@@ -87,13 +87,22 @@ class DATA_CATALOG(APIView) :
             lang = 'en'
 
         for item in info.iterator():
-            category = item['catalog_category'] 
-            item.pop('catalog_category', None)
-            item['catalog_name'] = item['catalog_name'].split(" | ")[ lang_mapping[lang] ]
+            print(item)
+            category = item['catalog_category_name'].split(" | ")[ lang_mapping[lang] ]            
+            sub_category = item['catalog_subcategory_name'].split(" | ")[ lang_mapping[lang] ]
+            
+            obj = {}
+            obj['catalog_name'] = item['catalog_name'].split(" | ")[ lang_mapping[lang] ]
+            obj['id']= item['id']
+
             if category not in res['dataset'] : 
-                res['dataset'][category] = [item]
+                res['dataset'][category] = {}
+                res['dataset'][category][sub_category] = [obj]
             else : 
-                res['dataset'][category].append(item)
+                if sub_category in res['dataset'][category] : 
+                    res['dataset'][category][sub_category].append(obj)
+                else : 
+                    res['dataset'][category][sub_category] = [obj]
 
         return JsonResponse(res, safe=False)
 

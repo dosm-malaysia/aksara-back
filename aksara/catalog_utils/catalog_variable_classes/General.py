@@ -23,16 +23,19 @@ class GeneralChartsUtil :
     metadata = {}
     downloads = {}
     api = {}
-    
+
     '''
     Initiailize the general information for a catalog variable
     '''
     def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src) :
+        self.full_meta = full_meta
+
+        self.general_meta_validation()
+
         self.file_data = file_data
-        self.meta_data = meta_data
+        self.meta_data = meta_data # a.k.a current data ( cur_data )
         self.variable_data = variable_data
         self.all_variable_data = all_variable_data
-        self.full_meta = full_meta
         self.read_from  = file_data['link_parquet']
         self.file_src = file_src
 
@@ -147,11 +150,15 @@ class GeneralChartsUtil :
         res['catalog_meta'] = self.full_meta
         res['catalog_name'] = self.variable_data['title_en'] + ' | ' + self.variable_data['title_bm']
         res['catalog_category'] = self.file_data['category']
+        res['catalog_category_name'] = self.file_data['category_en'] + ' | ' + self.file_data['category_bm']
+        res['catalog_subcategory'] = self.file_data['subcategory']
+        res['catalog_subcategory_name'] = self.file_data['subcategory_en'] + ' | ' + self.file_data['subcategory_bm']
         res['time_range'] = self.meta_data['catalog_filters']['frequency']
         res['geographic'] = ' | '.join(self.meta_data['catalog_filters']['geographic'])
         res['dataset_begin'] = self.meta_data['catalog_filters']['start']
         res['dataset_end'] = self.meta_data['catalog_filters']['end']
-        res['data_source'] = self.meta_data['catalog_filters']['data_source']
+        res['data_source'] = ' | '.join(self.meta_data['catalog_filters']['data_source'])
+
         res['file_src'] = self.file_src
 
         return res
@@ -168,3 +175,45 @@ class GeneralChartsUtil :
         res['chart_details'] = self.chart_details
 
         return res
+
+    '''
+    General purpose method to cross-check between data-types required
+    '''
+    def validate_data_type(self, fields, src, src_level) :
+        for f, v in fields.items() :
+            for i in v : 
+                if type( src_level[i] ).__name__ != f : 
+                    raise Exception("Source : " + src + " Key : '" + i + "', should be a " + f + "!") 
+
+    '''
+    General purpose method to check for the presence of a field
+    '''
+    def validate_field_presence(self, fields, src, src_level) : 
+        for f in fields : 
+            if f not in src_level : 
+                raise Exception("Source : " + src + " Key : '" + f + "', not found in meta!")
+
+    '''
+    General validation to validate all general-fields within a data catalog 
+    '''
+    def general_meta_validation(self) : 
+        data = self.full_meta
+        src = self.file_src
+
+        self.validate_field_presence(['file', 'catalog_data'], src, data)
+        s = {'dict' : ['file'], 'list' : ['catalog_data']}
+        self.validate_data_type(s, src, data)
+
+        self.validate_field_presence(['variables'], src, data['file'])
+        s = {'list' : ['variables']}
+        self.validate_data_type(s, src, data['file'])
+
+        self.validate_field_presence(['category', 'category_en', 'category_bm', 'file_name', 'bucket', 'link_parquet', 'link_csv', 'link_metadata', 'description'], src, data['file'])
+        s = {'str' : ['category', 'category_en', 'category_bm', 'file_name', 'bucket', 'link_parquet', 'link_csv', 'link_metadata'], 'dict' : ['description']}
+        self.validate_data_type(s, src, data['file'])
+
+        self.validate_field_presence(['en', 'bm'], src, data['file']['description'])
+        s = {'str' : ['en', 'bm']}
+        self.validate_data_type(s, src, data['file']['description'])
+
+

@@ -35,6 +35,8 @@ class Timeseries(GeneralChartsUtil) :
     def __init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src):
         GeneralChartsUtil.__init__(self, full_meta, file_data, meta_data ,variable_data, all_variable_data, file_src)
 
+        # self.validate_meta_json()
+
         if meta_data['chart']['chart_filters']['SLICE_BY'] : 
             self.api_filter = meta_data['chart']['chart_filters']['SLICE_BY'][0]
         else :
@@ -178,3 +180,47 @@ class Timeseries(GeneralChartsUtil) :
         res['API']['chart_type'] = self.meta_data['chart']['chart_type']
 
         return res['API']
+
+    def validate_meta_json(self) :
+        src = self.variable_name
+
+        if len(self.all_variable_data) != len(self.full_meta['catalog_data']) : 
+            raise Exception("Source : " + src + ", Catalog data and Variables length is not the same!")
+
+        self.validate_field_presence(["id", "name", "title_en", "title_bm", "desc_en", "desc_bm"], src, self.variable_data)
+        s = {'int' : ["id"], 'str' : ["name", "title_en", "title_bm", "desc_en", "desc_bm"]}
+        self.validate_data_type(s, src, self.variable_data)
+
+        self.validate_field_presence(["id", "catalog_filters", "metadata_neutral", "metadata_lang", "chart"], src, self.meta_data)
+        s = {'int' : ['id'], 'dict' : ["catalog_filters", "metadata_neutral", "metadata_lang", "chart"] }
+        self.validate_data_type(s, src, self.meta_data)
+
+        self.validate_field_presence(["frequency", "geographic", "start", "end", "data_source"], src, self.meta_data['catalog_filters'])
+        s = {"str" : ["frequency", "start", "end"], "list" : ["geographic", "data_source"]}
+        self.validate_data_type(s, src, self.meta_data['catalog_filters'])
+
+        self.validate_field_presence(["data_as_of", "last_updated", "next_update"], src, self.meta_data['metadata_neutral'])
+        s = {"str" : ["data_as_of", "last_updated", "next_update"]}
+        self.validate_data_type(s, src, self.meta_data['metadata_neutral'])
+
+        self.validate_field_presence(["methodology", "caveat"], src, self.meta_data['metadata_lang']['en'])
+        self.validate_field_presence(["methodology", "caveat"], src, self.meta_data['metadata_lang']['bm'])
+        s = {"str" : ["methodology", "caveat"]}
+        self.validate_data_type(s, src, self.meta_data['metadata_lang']['en'])
+        self.validate_data_type(s, src, self.meta_data['metadata_lang']['bm'])
+
+        self.validate_field_presence(["chart_type", "chart_filters", "chart_variables"], src, self.meta_data['chart'])
+        s = {"str" : ["chart_type"]}
+        self.validate_data_type(s, src, self.meta_data['chart'])
+
+        self.validate_field_presence(["SLICE_BY"], src, self.meta_data['chart']['chart_filters'])
+        s = {"list" : ["SLICE_BY"]}
+        self.validate_data_type(s, src, self.meta_data['chart']['chart_filters'])
+
+        self.validate_field_presence(["parents", "operation", "format"], src, self.meta_data['chart']['chart_variables'])
+        s = {"str" : ["operation"], "list" : ["parents"], "dict" : ["format"]}
+        self.validate_data_type(s, src, self.meta_data['chart']['chart_variables'])
+
+        self.validate_field_presence(["x", "y", "line"], src, self.meta_data["chart"]["chart_variables"]["format"])
+        s = {"str" : ["x", "y", "line"]}
+        self.validate_data_type(s, src, self.meta_data["chart"]["chart_variables"]["format"])
