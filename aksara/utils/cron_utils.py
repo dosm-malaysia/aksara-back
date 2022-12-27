@@ -161,7 +161,7 @@ def selective_update() :
 Filters the changed files for dashboards and catalog data
 '''
 def filter_changed_files(file_list) : 
-    changed_files = {'dashboards' : [], 'catalog' : []}
+    changed_files = {'dashboards' : [], 'catalog' : [], 'dashboards_deleted' : [], 'catalog_deleted' : []}
 
     for f in file_list :
         f_path = "AKSARA_SRC/aksara-data-main/" + f
