@@ -9,7 +9,6 @@ into respective chart builders
 
 def build_chart(chart_type, data) :
     variables = data['variables']
-    # input_file = os.path.join(os.getcwd(), 'KKMNOW_SRC/kkmnow-data-main') + '/' + data['input']
     input_file = data['input']
 
     if chart_type == 'bar_chart':
@@ -36,5 +35,7 @@ def build_chart(chart_type, data) :
         return jitter_chart(input_file, variables)
     elif chart_type == 'pyramid_chart' : 
         return pyramid_chart(input_file, variables)
+    elif chart_type == 'metrics_table' : 
+        return metrics_table(input_file, variables)
     else:
         return {}

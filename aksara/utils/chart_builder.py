@@ -493,3 +493,29 @@ def pyramid_chart(file_name, variables) :
             res[k][v] = cur_df[s_values].values.tolist()[0]
 
     return res
+
+
+'''
+Builds a metrics table
+'''
+
+def metrics_table(file_name, variables) :
+    keys = variables['keys']
+    attr = variables['obj_attr']    
+    cols = list(attr.keys())
+
+    df = pd.read_parquet(file_name)
+
+    df['u_groups'] = list(df[keys].itertuples(index=False, name=None))
+    u_groups_list = df['u_groups'].unique().tolist()
+
+    res = {}
+    for group in u_groups_list :        
+        result = {}
+        start = df.groupby(keys)[cols].get_group(group).rename(columns=attr).to_dict('records')
+        for b in group[::-1]:
+            result = {b: start}
+            start = result
+        merge(res, result)
+
+    return res
