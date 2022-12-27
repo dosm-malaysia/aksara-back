@@ -132,6 +132,8 @@ def selective_update() :
             fin_files = [ x.replace(".json", "") for x in filtered_changes['dashboards']]
             file_list = ",".join(fin_files)
 
+            triggers.send_telegram("Updating : " + file_list)
+            
             operation = "UPDATE " + file_list
             data_utils.rebuild_dashboard_meta(operation, "AUTO")
             validate_info = data_utils.rebuild_dashboard_charts(operation, "AUTO")            
