@@ -1,7 +1,7 @@
 import os
 from os import listdir
 from os.path import isfile, join
-from aksara.models import MetaJson, KKMNowJSON
+from aksara.models import MetaJson, DashboardJson
 from aksara.utils import triggers
 from aksara.utils import data_utils
 from aksara.utils import common
@@ -18,7 +18,7 @@ Creates a directory
 '''
 def create_directory(dir_name) :
     try: 
-        os.mkdir(os.path.join(os.getcwd(), dir_name)) # KKMNOW_SRC
+        os.mkdir(os.path.join(os.getcwd(), dir_name))
     except OSError as error: 
         print("Directory already exists, no need to create")
 
@@ -146,7 +146,6 @@ def selective_update() :
                 if dbd not in failed_dashboards : 
                     revalidate_frontend(dbd)
                 else : 
-                    print("Validation for " + dbd + " : " + " not sent.")
                     triggers.send_telegram("Validation for " + dbd + " : " + " not sent.")
 
         if filtered_changes['catalog'] : 

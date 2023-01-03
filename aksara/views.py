@@ -11,8 +11,8 @@ from functools import reduce
 from django.db.models import Q
 
 from aksara.utils import cron_utils, triggers
-from aksara.serializers import MetaSerializer, KKMSerializer, CatalogSerializer
-from aksara.models import MetaJson, KKMNowJSON, CatalogJson
+from aksara.serializers import MetaSerializer, DashboardSerializer, CatalogSerializer
+from aksara.models import MetaJson, DashboardJson, CatalogJson
 from aksara.api_handling import handle
 
 from threading import Thread
@@ -37,7 +37,6 @@ class UPDATE(APIView) :
         thread = Thread(target=cron_utils.selective_update)
         thread.start()
         return Response(status=status.HTTP_200_OK)
-        
         # return JsonResponse({'status':401,'message':"unauthorized"}, status=401)
 
 class DASHBOARD(APIView):
@@ -242,7 +241,7 @@ def handle_request(param_list):
                 cur_chart_data = cache.get(dbd_name + "_" + k)
 
                 if not cur_chart_data :
-                    cur_chart_data = KKMNowJSON.objects.filter(dashboard_name=dbd_name, chart_name=k).values('chart_data')[0]['chart_data']                    
+                    cur_chart_data = DashboardJson.objects.filter(dashboard_name=dbd_name, chart_name=k).values('chart_data')[0]['chart_data']                    
                     cache.set(dbd_name + "_" + k, cur_chart_data)
 
                 data_as_of = None if 'data_as_of' not in cur_chart_data else cur_chart_data['data_as_of']

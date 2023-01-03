@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
-from aksara.models import MetaJson, KKMNowJSON
+from aksara.models import MetaJson, DashboardJson
 from aksara.utils import dashboard_builder
 from aksara.utils import triggers
 from aksara.utils import common
@@ -87,7 +87,7 @@ def rebuild_dashboard_charts(operation, op_method) :
 
 
     if operation == 'REBUILD' : 
-        KKMNowJSON.objects.all().delete()
+        DashboardJson.objects.all().delete()
 
     if meta_files : 
         meta_json_list = MetaJson.objects.filter(dashboard_name__in=meta_files).values()
@@ -119,7 +119,7 @@ def rebuild_dashboard_charts(operation, op_method) :
                         res['data_as_of']  = chart_list[k]['data_as_of']
 
                     updated_values = {'chart_type' : chart_type, 'api_type' : api_type, 'chart_data' : res}
-                    obj, created = KKMNowJSON.objects.update_or_create(dashboard_name=dbd_name, chart_name=k, defaults=updated_values)
+                    obj, created = DashboardJson.objects.update_or_create(dashboard_name=dbd_name, chart_name=k, defaults=updated_values)
                     obj.save()
                     cache.set(dbd_name + "_" + k, res)
             except Exception as e:

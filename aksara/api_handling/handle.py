@@ -1,4 +1,4 @@
-from aksara.models import MetaJson, KKMNowJSON, CatalogJson
+from aksara.models import MetaJson, DashboardJson, CatalogJson
 
 '''
 Build methods for any post-handling / additional info,

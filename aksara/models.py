@@ -5,7 +5,7 @@ class MetaJson(models.Model) :
     dashboard_name = models.CharField(max_length=200)
     dashboard_meta = models.JSONField()
 
-class KKMNowJSON(models.Model) :
+class DashboardJson(models.Model) :
     dashboard_name = models.CharField(max_length=200)
     chart_name = models.CharField(max_length=200, null=True)
     chart_type = models.CharField(max_length=200, null=True)
