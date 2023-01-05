@@ -1,3 +1,7 @@
+from django.core.cache import cache
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+
 from aksara.catalog_utils import general_helper as gh
 from aksara.catalog_utils.catalog_variable_classes import Timeseries as tm
 from aksara.catalog_utils.catalog_variable_classes import Choropleth as ch
@@ -92,6 +96,8 @@ def catalog_update(operation, op_method):
                     db_obj, created = CatalogJson.objects.update_or_create(
                         id=unique_id, defaults=db_input
                     )
+
+                    cache.set(unique_id, db_input["catalog_data"])
                     triggers.send_telegram(obj.variable_name + " : COMPLETED")
         except Exception as e:
             triggers.send_telegram(str(e))

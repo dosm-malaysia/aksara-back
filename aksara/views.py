@@ -229,8 +229,12 @@ General handler for data-variables
 
 def data_variable_handler(param_list):
     var_id = param_list["id"][0]
-    info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
-    info = info[0]["catalog_data"]
+    info = cache.get(var_id)
+
+    if not info:
+        info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
+        info = info[0]["catalog_data"]
+
     chart_type = info["API"]["chart_type"]
 
     info["chart_details"] = data_variable_chart_handler(info, chart_type, param_list)
