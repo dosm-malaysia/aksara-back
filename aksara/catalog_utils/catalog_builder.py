@@ -11,68 +11,108 @@ from os import listdir
 from os.path import isfile, join
 import pathlib
 
-def catalog_update(operation, op_method) :
-        opr_data = data_utils.get_operation_files(operation)
-        operation = opr_data['operation']
-        meta_files = opr_data['files']
 
-        META_DIR = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/catalog/')
+def catalog_update(operation, op_method):
+    opr_data = data_utils.get_operation_files(operation)
+    operation = opr_data["operation"]
+    meta_files = opr_data["files"]
 
-        if operation == 'REBUILD' : 
-            CatalogJson.objects.all().delete()
+    META_DIR = os.path.join(os.getcwd(), "AKSARA_SRC/aksara-data-main/catalog/")
 
-        if not meta_files : 
-            meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
-        else : 
-            meta_files = [f + ".json" for f in meta_files ]
-        
-        for meta in meta_files :
-            try : 
-                FILE_META = os.path.join(os.getcwd(), 'AKSARA_SRC/aksara-data-main/catalog/' + meta)
-                
-                if pathlib.Path(meta).suffix == '.json': 
-                    data = gh.read_json(FILE_META)
-                    file_data = data['file']
-                    all_variable_data = data['file']['variables']
-                    catalog_data = data['catalog_data']
-                    full_meta = data
-                    file_src = meta.replace('.json', '') 
+    if operation == "REBUILD":
+        CatalogJson.objects.all().delete()
 
-                    for cur_data in catalog_data :
-                        chart_type = cur_data['chart']['chart_type']
-                        obj = []
-                        variable_data = all_variable_data[ cur_data['id'] - 1 ]
+    if not meta_files:
+        meta_files = [f for f in listdir(META_DIR) if isfile(join(META_DIR, f))]
+    else:
+        meta_files = [f + ".json" for f in meta_files]
 
-                        if chart_type == 'TIMESERIES' :
-                            obj = tm.Timeseries(full_meta, file_data, cur_data, variable_data, all_variable_data, file_src)
-                        elif chart_type == 'CHOROPLETH' : 
-                            obj = ch.Choropleth(full_meta, file_data, cur_data, variable_data, all_variable_data, file_src)
-                        elif chart_type == 'TABLE' : 
-                            variable_data = all_variable_data[0]
-                            obj = tb.Table(full_meta, file_data, cur_data, variable_data, all_variable_data, file_src)
+    for meta in meta_files:
+        try:
+            FILE_META = os.path.join(
+                os.getcwd(), "AKSARA_SRC/aksara-data-main/catalog/" + meta
+            )
 
-                        db_input = obj.db_input
-                        unique_id = obj.unique_id
-                        
-                        db_obj, created = CatalogJson.objects.update_or_create(id=unique_id, defaults=db_input)
-                        triggers.send_telegram(obj.variable_name + " : COMPLETED")
-            except Exception as e: 
-                triggers.send_telegram(str(e))    
+            if pathlib.Path(meta).suffix == ".json":
+                data = gh.read_json(FILE_META)
+                file_data = data["file"]
+                all_variable_data = data["file"]["variables"]
+                catalog_data = data["catalog_data"]
+                full_meta = data
+                file_src = meta.replace(".json", "")
 
-def catalog_operation(operation, op_method) :
-    try : 
-        dir_name = 'AKSARA_SRC'
-        zip_name = 'repo.zip'
-        git_url = 'https://github.com/dosm-malaysia/aksara-data/archive/main.zip'
-        git_token = os.getenv('GITHUB_TOKEN', '-')
+                for cur_data in catalog_data:
+                    chart_type = cur_data["chart"]["chart_type"]
+                    obj = []
+                    variable_data = {}
+                    # variable_data = all_variable_data[ cur_data['id'] - 1 ]
+
+                    for var in all_variable_data:
+                        if chart_type == "TABLE":
+                            if var["id"] == 0:
+                                variable_data = var
+                                break
+                        else:
+                            if cur_data["id"] == var["id"]:
+                                variable_data = var
+                                break
+
+                    if chart_type == "TIMESERIES":
+                        obj = tm.Timeseries(
+                            full_meta,
+                            file_data,
+                            cur_data,
+                            variable_data,
+                            all_variable_data,
+                            file_src,
+                        )
+                    elif chart_type == "CHOROPLETH":
+                        obj = ch.Choropleth(
+                            full_meta,
+                            file_data,
+                            cur_data,
+                            variable_data,
+                            all_variable_data,
+                            file_src,
+                        )
+                    elif chart_type == "TABLE":
+                        # variable_data = all_variable_data[0]
+                        obj = tb.Table(
+                            full_meta,
+                            file_data,
+                            cur_data,
+                            variable_data,
+                            all_variable_data,
+                            file_src,
+                        )
+
+                    db_input = obj.db_input
+                    unique_id = obj.unique_id
+
+                    db_obj, created = CatalogJson.objects.update_or_create(
+                        id=unique_id, defaults=db_input
+                    )
+                    triggers.send_telegram(obj.variable_name + " : COMPLETED")
+        except Exception as e:
+            triggers.send_telegram(str(e))
+
+
+def catalog_operation(operation, op_method):
+    try:
+        dir_name = "AKSARA_SRC"
+        zip_name = "repo.zip"
+        git_url = "https://github.com/dosm-malaysia/aksara-data/archive/main.zip"
+        git_token = os.getenv("GITHUB_TOKEN", "-")
 
         cron_utils.create_directory(dir_name)
         res = cron_utils.fetch_from_git(zip_name, git_url, git_token)
 
-        if 'resp_code' in res and res['resp_code'] == 200 : 
-            triggers.send_telegram("------- PERFORMING " + op_method + " DATA CATALOG UPDATE -------")
-            cron_utils.write_as_binary(res['file_name'], res['data'])
-            cron_utils.extract_zip(res['file_name'], dir_name)
+        if "resp_code" in res and res["resp_code"] == 200:
+            triggers.send_telegram(
+                "------- PERFORMING " + op_method + " DATA CATALOG UPDATE -------"
+            )
+            cron_utils.write_as_binary(res["file_name"], res["data"])
+            cron_utils.extract_zip(res["file_name"], dir_name)
             catalog_update(operation, op_method)
-    except Exception as e: 
-        print(e)    
+    except Exception as e:
+        print(e)
