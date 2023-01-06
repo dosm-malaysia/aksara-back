@@ -48,17 +48,19 @@ class CHART(APIView):
             api_type = meta["charts"][chart_name]["api_type"]
             chart_variables = meta["charts"][chart_name]["variables"]
 
-            #  TEMP FIX
+            chart_data = DashboardJson.objects.filter(
+                dashboard_name=dbd_name, chart_name=chart_name
+            ).values("chart_data")[0]["chart_data"]
 
+            data_as_of = chart_data["data_as_of"]
+            chart_data = chart_data["data"]
+
+            #  TEMP FIX
             temp = {}
             if chart_type == "timeseries_shared":
                 const_keys = list(chart_variables["constant"].keys())
                 for k in const_keys:
                     temp[k] = chart_data[k]
-
-            chart_data = DashboardJson.objects.filter(
-                dashboard_name=dbd_name, chart_name=chart_name
-            ).values("chart_data")[0]["chart_data"]
 
             for api in api_params:
                 if api in param_list:
@@ -69,7 +71,11 @@ class CHART(APIView):
             if temp:
                 chart_data.update(temp)
 
-        return JsonResponse(chart_data, safe=False)
+            overall_data = {}
+            overall_data["data"] = chart_data
+            overall_data["data_as_of"] = data_as_of
+
+        return JsonResponse(overall_data, safe=False)
 
 
 class UPDATE(APIView):
