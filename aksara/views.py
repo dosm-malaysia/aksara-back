@@ -31,6 +31,42 @@ TODO :
 """
 
 
+class CHART(APIView):
+    def get(self, request, format=None):
+        param_list = dict(request.GET)
+        params_req = ["dashboard", "chart_name"]
+
+        if all(p in param_list for p in params_req):
+            dbd_name = param_list["dashboard"][0]
+            chart_name = param_list["chart_name"][0]
+
+            meta = MetaJson.objects.filter(dashboard_name=dbd_name).values(
+                "dashboard_meta"
+            )[0]["dashboard_meta"]
+            api_params = meta["charts"][chart_name]["api_params"]
+            chart_type = meta["charts"][chart_name]["chart_type"]
+            api_type = meta["charts"][chart_name]["api_type"]
+            chart_variables = meta["charts"][chart_name]["variables"]
+
+            chart_data = DashboardJson.objects.filter(
+                dashboard_name=dbd_name, chart_name=chart_name
+            ).values("chart_data")[0]["chart_data"]
+
+            for api in api_params:
+                if api in param_list:
+                    chart_data = chart_data[param_list[api][0]]
+                else:
+                    return JsonResponse({}, safe=False)
+
+            if chart_type == "timeseries_shared":
+                temp = {}
+                const_keys = list(chart_variables["constant"].keys())
+                for k in const_keys:
+                    temp[k] = chart_data[k]
+
+        return JsonResponse(chart_data, safe=False)
+
+
 class UPDATE(APIView):
     def post(self, request, format=None):
         # if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
@@ -293,7 +329,7 @@ def handle_request(param_list):
                     if data_as_of:
                         res[k]["data_as_of"] = data_as_of
                     res[k]["data"] = cur_chart_data["data"]
-                else:
+                elif api_type == "dynamic":
                     if len(api_params) > 0:
                         cur_chart_data = get_nested_data(
                             api_params, param_list, cur_chart_data["data"]
@@ -304,6 +340,7 @@ def handle_request(param_list):
                         if data_as_of:
                             res[k]["data_as_of"] = data_as_of
                         res[k]["data"] = cur_chart_data
+
     return res
 
 

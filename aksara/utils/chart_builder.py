@@ -582,3 +582,45 @@ def metrics_table(file_name: str, variables: MetricsTableVariables):
         merge(res, result)
 
     return res
+
+
+"""
+Timeseries chart builder for values which are shared
+"""
+
+
+def timeseries_shared(file_name: str, variables):
+    keys = variables["keys"]
+    constant = variables["constant"]
+    attributes = variables["attributes"]
+
+    df = pd.read_parquet(file_name)
+    df = df.replace({np.nan: None})
+
+    df["date"] = pd.to_datetime(df["date"])
+    df["date"] = df["date"].values.astype(np.int64) // 10**6
+
+    res = {}
+
+    for k, v in constant.items():
+        res[k] = df[v].unique().tolist()
+
+    if len(keys) == 0:
+        for k, v in attributes.items():
+            res[k] = df[v].to_list()
+    else:
+        df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
+        u_groups_list = df["u_groups"].unique().tolist()
+
+        grouped_df = df.groupby(keys)
+
+        for grp in u_groups_list:
+            temp_df = grouped_df.get_group(grp)
+            val_res = temp_df["value"].to_list()
+
+            result = val_res
+            for b in grp[::-1]:
+                result = {b: result}
+            merge(res, result)
+
+    return res
