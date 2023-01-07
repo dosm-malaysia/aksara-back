@@ -616,7 +616,9 @@ def timeseries_shared(file_name: str, variables):
 
         for grp in u_groups_list:
             temp_df = grouped_df.get_group(grp)
-            val_res = temp_df["value"].to_list()
+            val_res = {}
+            for k,v in attributes.items():
+                val_res[k] = temp_df[v].to_list()
 
             result = val_res
             for b in grp[::-1]:
