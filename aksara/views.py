@@ -21,7 +21,6 @@ import json
 import os
 import environ
 
-
 env = environ.Env()
 environ.Env.read_env()
 
@@ -85,6 +84,11 @@ class UPDATE(APIView):
         thread.start()
         return Response(status=status.HTTP_200_OK)
         # return JsonResponse({'status':401,'message':"unauthorized"}, status=401)
+
+    def get(self, request, format=None):
+        # Gets list of meta in db
+
+        return JsonResponse({}, safe=False)
 
 
 class DASHBOARD(APIView):

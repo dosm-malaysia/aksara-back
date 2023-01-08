@@ -7,7 +7,8 @@ from aksara.utils import data_utils
 from aksara.utils import common
 from aksara.catalog_utils import catalog_builder
 
-from aksara.models import CatalogJson
+from aksara.models import CatalogJson, MetaJson, DashboardJson
+from django.apps import apps
 
 import requests
 import zipfile
@@ -135,19 +136,7 @@ def selective_update():
         changed_files = [f["filename"] for f in data["files"]]
         filtered_changes = filter_changed_files(changed_files)
 
-        if filtered_changes["dashboards_deleted"]:
-            remove_files = [
-                x.replace(".json", "") for x in filtered_changes["dashboards_deleted"]
-            ]
-            if remove_files:
-                MetaJson.objects.filter(file_src__in=remove_files).delete()
-
-        if filtered_changes["catalog_deleted"]:
-            remove_files = [
-                x.replace(".json", "") for x in filtered_changes["catalog_deleted"]
-            ]
-            if remove_files:
-                CatalogJson.objects.filter(file_src__in=remove_files).delete()
+        remove_deleted_files()
 
         if filtered_changes["dashboards"]:
             fin_files = [x.replace(".json", "") for x in filtered_changes["dashboards"]]
@@ -187,23 +176,38 @@ Filters the changed files for dashboards and catalog data
 
 
 def filter_changed_files(file_list):
-    changed_files = {
-        "dashboards": [],
-        "catalog": [],
-        "dashboards_deleted": [],
-        "catalog_deleted": [],
-    }
+    changed_files = {"dashboards": [], "catalog": []}
 
     for f in file_list:
         f_path = "AKSARA_SRC/aksara-data-main/" + f
         f_info = f.split("/")
-        if len(f_info) > 1 and f_info[0] in changed_files:
-            if os.path.exists(f_path):
-                changed_files[f_info[0]].append(f_info[1])
-            else:
-                changed_files[f_info[0] + "_deleted"].append(f_info[1])
+        if len(f_info) > 1 and f_info[0] in changed_files and os.path.exists(f_path):
+            changed_files[f_info[0]].append(f_info[1])
 
     return changed_files
+
+
+"""
+Remove deleted files
+"""
+
+
+def remove_deleted_files():
+    for k, v in common.REFRESH_VARIABLES.items():
+        model_name = apps.get_model("aksara", k)
+        distinct_db = [
+            m[v["column_name"]]
+            for m in model_name.objects.values(v["column_name"]).distinct()
+        ]
+        DIR = os.path.join(os.getcwd(), v["directory"])
+        distinct_dir = [
+            f.replace(".json", "") for f in listdir(DIR) if isfile(join(DIR, f))
+        ]
+        diff = list(set(distinct_db) - set(distinct_dir))
+
+        if diff:
+            query = {v["column_name"] + "__in": diff}
+            model_name.objects.filter(**query).delete()
 
 
 """
