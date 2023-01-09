@@ -24,10 +24,11 @@ class Timeseries(GeneralChartsUtil):
         "DAILY": "Daily",
         "WEEKLY": "Weekly",
         "MONTHLY": "Monthly",
+        "QUARTERLY": "quarterly",
         "YEARLY": "Yearly",
     }
     timeline = {"DAILY": 2, "WEEKLY": 5}
-    group_time = {"WEEKLY": "W", "MONTHLY": "M", "YEARLY": "Y"}
+    group_time = {"WEEKLY": "W", "MONTHLY": "M", "QUARTERLY": "Q", "YEARLY": "Y"}
 
     # Chart related
     chart_name = {}
@@ -250,7 +251,7 @@ class Timeseries(GeneralChartsUtil):
     """
 
     def get_range_values(self):
-        pos = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]
+        pos = ["DAILY", "WEEKLY", "MONTHLY", "QUARTERLY", "YEARLY"]
         index = pos.index(self.frequency)
         return pos[index:]
 
