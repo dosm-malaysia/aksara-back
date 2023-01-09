@@ -24,7 +24,7 @@ class Timeseries(GeneralChartsUtil):
         "DAILY": "Daily",
         "WEEKLY": "Weekly",
         "MONTHLY": "Monthly",
-        "QUARTERLY": "quarterly",
+        "QUARTERLY": "Quarterly",
         "YEARLY": "Yearly",
     }
     timeline = {"DAILY": 2, "WEEKLY": 5}

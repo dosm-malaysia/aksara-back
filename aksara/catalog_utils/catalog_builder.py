@@ -45,6 +45,8 @@ def catalog_update(operation, op_method):
                 full_meta = data
                 file_src = meta.replace(".json", "")
 
+                # print("FILE_SRC : " + file_src)
+
                 for cur_data in catalog_data:
                     chart_type = cur_data["chart"]["chart_type"]
                     obj = []

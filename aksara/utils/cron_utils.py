@@ -13,6 +13,7 @@ from django.apps import apps
 import requests
 import zipfile
 import json
+import shutil
 
 """
 Creates a directory
@@ -165,6 +166,10 @@ def selective_update():
             file_list = ",".join(fin_files)
             operation = "UPDATE " + file_list
             catalog_builder.catalog_update(operation, "AUTO")
+
+        # Delete all file src
+        os.remove("repo.zip")
+        shutil.rmtree("AKSARA_SRC/")
 
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
