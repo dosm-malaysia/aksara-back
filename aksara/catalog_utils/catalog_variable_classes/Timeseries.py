@@ -132,6 +132,7 @@ class Timeseries(GeneralChartsUtil):
         for range in self.applicable_frequency:
             res[range] = {}
             range_df = df.copy()
+
             if range in self.timeline:
                 last_date = pd.Timestamp(pd.to_datetime(range_df["date"].max()))
                 start_date = pd.Timestamp(
@@ -172,16 +173,24 @@ class Timeseries(GeneralChartsUtil):
                     res[range]["x"] = (
                         new_temp_df.groupby(self.t_keys)["interval"]
                         .get_group(cur_group)
+                        .replace({np.nan: None})
                         .to_list()
                     )
                     res[range]["y"] = (
                         new_temp_df.groupby(self.t_keys)[self.t_format["y"]]
                         .get_group(cur_group)
+                        .replace({np.nan: None})
                         .to_list()
                     )
                 else:
-                    res[range]["x"] = new_temp_df["interval"].to_list()
-                    res[range]["y"] = new_temp_df[self.t_format["y"]].to_list()
+                    res[range]["x"] = (
+                        new_temp_df["interval"].replace({np.nan: None}).to_list()
+                    )
+                    res[range]["y"] = (
+                        new_temp_df[self.t_format["y"]]
+                        .replace({np.nan: None})
+                        .to_list()
+                    )
 
                 res["TABLE"]["data"][range] = self.build_variable_table(
                     res[range]["x"], res[range]["y"]
@@ -192,10 +201,15 @@ class Timeseries(GeneralChartsUtil):
                         res[range]["line"] = (
                             new_temp_df.groupby(self.t_keys)[self.t_format["y"]]
                             .get_group(cur_group)
+                            .replace({np.nan: None})
                             .to_list()
                         )
                     else:
-                        res[range]["line"] = new_temp_df[self.t_format["y"]].to_list()
+                        res[range]["line"] = (
+                            new_temp_df[self.t_format["y"]]
+                            .replace({np.nan: None})
+                            .to_list()
+                        )
             else:
                 range_df["date"] = range_df["date"].values.astype(np.int64) // 10**6
 
@@ -203,11 +217,13 @@ class Timeseries(GeneralChartsUtil):
                     res[range]["x"] = (
                         range_df.groupby(self.t_keys)["date"]
                         .get_group(cur_group)
+                        .replace({np.nan: None})
                         .to_list()
                     )
                     res[range]["y"] = (
                         range_df.groupby(self.t_keys)[self.t_format["y"]]
                         .get_group(cur_group)
+                        .replace({np.nan: None})
                         .to_list()
                     )
                     dma_col = (
@@ -227,8 +243,10 @@ class Timeseries(GeneralChartsUtil):
                         .to_list()
                     )
                 else:
-                    res[range]["x"] = range_df["date"].to_list()
-                    res[range]["y"] = range_df[self.t_format["y"]].to_list()
+                    res[range]["x"] = range_df["date"].replace({np.nan: None}).to_list()
+                    res[range]["y"] = (
+                        range_df[self.t_format["y"]].replace({np.nan: None}).to_list()
+                    )
                     dma_col = (
                         self.t_format["y"]
                         if self.t_format["line"] == ""

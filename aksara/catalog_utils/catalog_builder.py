@@ -45,62 +45,90 @@ def catalog_update(operation, op_method):
                 full_meta = data
                 file_src = meta.replace(".json", "")
 
+                failed_builds = []
+                all_builds = []
+
                 # print("FILE_SRC : " + file_src)
 
                 for cur_data in catalog_data:
-                    chart_type = cur_data["chart"]["chart_type"]
-                    obj = []
-                    variable_data = {}
-                    # variable_data = all_variable_data[ cur_data['id'] - 1 ]
+                    try:
+                        chart_type = cur_data["chart"]["chart_type"]
+                        obj = []
+                        variable_data = {}
+                        # variable_data = all_variable_data[ cur_data['id'] - 1 ]
 
-                    for var in all_variable_data:
-                        if chart_type == "TABLE":
-                            if var["id"] == 0:
-                                variable_data = var
-                                break
-                        else:
-                            if cur_data["id"] == var["id"]:
-                                variable_data = var
-                                break
+                        for var in all_variable_data:
+                            if chart_type == "TABLE":
+                                if var["id"] == 0:
+                                    variable_data = var
+                                    break
+                            else:
+                                if cur_data["id"] == var["id"]:
+                                    variable_data = var
+                                    break
 
-                    if chart_type == "TIMESERIES":
-                        obj = tm.Timeseries(
-                            full_meta,
-                            file_data,
-                            cur_data,
-                            variable_data,
-                            all_variable_data,
-                            file_src,
+                        if chart_type == "TIMESERIES":
+                            obj = tm.Timeseries(
+                                full_meta,
+                                file_data,
+                                cur_data,
+                                variable_data,
+                                all_variable_data,
+                                file_src,
+                            )
+                        elif chart_type == "CHOROPLETH":
+                            obj = ch.Choropleth(
+                                full_meta,
+                                file_data,
+                                cur_data,
+                                variable_data,
+                                all_variable_data,
+                                file_src,
+                            )
+                        elif chart_type == "TABLE":
+                            # variable_data = all_variable_data[0]
+                            obj = tb.Table(
+                                full_meta,
+                                file_data,
+                                cur_data,
+                                variable_data,
+                                all_variable_data,
+                                file_src,
+                            )
+
+                        db_input = obj.db_input
+                        unique_id = obj.unique_id
+
+                        db_obj, created = CatalogJson.objects.update_or_create(
+                            id=unique_id, defaults=db_input
                         )
-                    elif chart_type == "CHOROPLETH":
-                        obj = ch.Choropleth(
-                            full_meta,
-                            file_data,
-                            cur_data,
-                            variable_data,
-                            all_variable_data,
-                            file_src,
-                        )
-                    elif chart_type == "TABLE":
-                        # variable_data = all_variable_data[0]
-                        obj = tb.Table(
-                            full_meta,
-                            file_data,
-                            cur_data,
-                            variable_data,
-                            all_variable_data,
-                            file_src,
-                        )
 
-                    db_input = obj.db_input
-                    unique_id = obj.unique_id
+                        cache.set(unique_id, db_input["catalog_data"])
+                        all_builds.append(
+                            {"status": "✅", "variable": variable_data["name"]}
+                        )
+                    except Exception as e:
+                        all_builds.append(
+                            {"status": "❌", "variable": variable_data["name"]}
+                        )
+                        err_obj = {
+                            "variable name": variable_data["name"],
+                            "exception": str(e),
+                        }
+                        failed_builds.append(err_obj)
 
-                    db_obj, created = CatalogJson.objects.update_or_create(
-                        id=unique_id, defaults=db_input
+                if len(all_builds) > 0:
+                    results = triggers.format_status_message(
+                        all_builds, "Results for " + file_src
                     )
+                    triggers.send_telegram(results)
 
-                    cache.set(unique_id, db_input["catalog_data"])
-                    triggers.send_telegram(obj.variable_name + " : COMPLETED")
+                if len(failed_builds) > 0:
+                    results = triggers.format_multi_line(
+                        failed_builds, "❌ Failed Builds for " + file_src + " ❌"
+                    )
+                    triggers.send_telegram(results)
+
         except Exception as e:
             triggers.send_telegram(str(e))
 
