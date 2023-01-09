@@ -18,9 +18,10 @@ from django.urls import path
 from aksara import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('dashboard/', views.DASHBOARD.as_view(), name='DASHBOARD'),
-    path('data-variable/', views.DATA_VARIABLE.as_view(), name='DATA_VARIABLE'),
-    path('data-catalog/', views.DATA_CATALOG.as_view(), name='DATA_CATALOG'),
-    path('update/', views.UPDATE.as_view(), name='UPDATE')
+    path("admin/", admin.site.urls),
+    path("dashboard/", views.DASHBOARD.as_view(), name="DASHBOARD"),
+    path("data-variable/", views.DATA_VARIABLE.as_view(), name="DATA_VARIABLE"),
+    path("data-catalog/", views.DATA_CATALOG.as_view(), name="DATA_CATALOG"),
+    path("update/", views.UPDATE.as_view(), name="UPDATE"),
+    path("chart/", views.CHART.as_view(), name="CHART"),
 ]

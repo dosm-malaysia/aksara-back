@@ -43,6 +43,6 @@ class Command(BaseCommand):
         '''
 
         if category == 'DATA_CATALOG' : 
-            catalog_builder.catalog_operation(operation)
+            catalog_builder.catalog_operation(operation, "MANUAL")
         else : 
-            cron_utils.data_operation(operation)
+            cron_utils.data_operation(operation, "MANUAL")
