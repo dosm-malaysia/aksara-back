@@ -25,8 +25,7 @@ env = environ.Env()
 environ.Env.read_env()
 
 """
-TODO :
-1. Make sure filters for data variable includes English and BM
+Endpoint for all single charts
 """
 
 
@@ -79,22 +78,17 @@ class CHART(APIView):
 
 class UPDATE(APIView):
     def post(self, request, format=None):
-        # if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
-        thread = Thread(target=cron_utils.selective_update)
-        thread.start()
-        return Response(status=status.HTTP_200_OK)
-        # return JsonResponse({'status':401,'message':"unauthorized"}, status=401)
-
-    def get(self, request, format=None):
-        # Gets list of meta in db
-
-        return JsonResponse({}, safe=False)
+        if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            thread = Thread(target=cron_utils.selective_update)
+            thread.start()
+            return Response(status=status.HTTP_200_OK)
+        return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
 
 class DASHBOARD(APIView):
     def get(self, request, format=None):
-        # if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")) :
-        #     return JsonResponse({'status': 401,'message':"unauthorized"}, status=401)
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
         param_list = dict(request.GET)
         params_req = ["dashboard"]
@@ -109,6 +103,9 @@ class DASHBOARD(APIView):
 
 class DATA_VARIABLE(APIView):
     def get(self, request, format=None):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+
         param_list = dict(request.GET)
         params_req = ["id"]
 
@@ -121,6 +118,9 @@ class DATA_VARIABLE(APIView):
 
 class DATA_CATALOG(APIView):
     def get(self, request, format=None):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
         info = ""
@@ -190,7 +190,7 @@ def get_filters_applied(param_list):
 
     for k, v in default_params.items():
         if k in param_list:
-            if isinstance(v, str):  # Else get the multi-support
+            if isinstance(v, str):
                 default_params[k] = param_list[k][0]
             else:
                 default_params[k] = param_list[k][0].split(",")
