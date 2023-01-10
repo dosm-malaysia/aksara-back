@@ -153,13 +153,26 @@ def selective_update():
             failed_dashboards = validate_info["failed_dashboards"]
 
             # Validate each dashboard
+            dashboards_validate_status = []
+
             for dbd in dashboards_validate:
                 if dbd not in failed_dashboards:
-                    revalidate_frontend(dbd)
+                    if revalidate_frontend(dbd) == 200:
+                        dashboards_validate_status.append(
+                            {"status": "✅", "variable": dbd}
+                        )
+                    else:
+                        dashboards_validate_status.append(
+                            {"status": "❌", "variable": dbd}
+                        )
                 else:
-                    triggers.send_telegram(
-                        "Validation for " + dbd + " : " + " not sent."
-                    )
+                    dashboards_validate_status.append({"status": "❌", "variable": dbd})
+
+            if dashboards_validate_status:
+                revalidation_results = triggers.format_status_message(
+                    dashboards_validate_status, "-- DASHBOARD REVALIDATION STATUS --"
+                )
+                triggers.send_telegram(revalidation_results)
 
         if filtered_changes["catalog"]:
             fin_files = [x.replace(".json", "") for x in filtered_changes["catalog"]]
@@ -233,7 +246,4 @@ def revalidate_frontend(dashboard):
 
     response = requests.post(url, headers=headers, data=body)
 
-    if response.status_code == 200:
-        triggers.send_telegram(dashboard + " page, successfully validated.")
-    else:
-        triggers.send_telegram(dashboard + " page, failed to validated.")
+    return response.status_code
