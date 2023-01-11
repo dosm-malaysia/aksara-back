@@ -18,6 +18,7 @@ class Timeseries(GeneralChartsUtil):
     # Timeseries related fields
     frequency = ""
     applicable_frequency = []
+    limit_frequency = ""
 
     # Constant mappings
     timeseries_values = {
@@ -67,6 +68,11 @@ class Timeseries(GeneralChartsUtil):
             self.api_filter = []
 
         self.frequency = meta_data["catalog_filters"]["frequency"]
+        self.limit_frequency = (
+            meta_data["catalog_filters"]["limit_frequency"]
+            if "limit_frequency" in meta_data["catalog_filters"]
+            else False
+        )
         self.applicable_frequency = self.get_range_values()
         self.api = self.build_api_info()
 
@@ -270,6 +276,10 @@ class Timeseries(GeneralChartsUtil):
 
     def get_range_values(self):
         pos = ["DAILY", "WEEKLY", "MONTHLY", "QUARTERLY", "YEARLY"]
+
+        if self.limit_frequency:
+            return [self.frequency]
+
         index = pos.index(self.frequency)
         return pos[index:]
 

@@ -141,8 +141,20 @@ class DATA_CATALOG(APIView):
                 "catalog_subcategory_name",
             )
 
+        filter_sources_distinct = CatalogJson.objects.values("data_source").distinct()
+        source_filters = []
+
+        for x in filter_sources_distinct:
+            if "|" in x["data_source"]:
+                sources = x["data_source"].split(" | ")
+                for s in sources:
+                    source_filters.append(s)
+            else:
+                source_filters.append(x["data_source"])
+
         res = {}
         res["total_all"] = len(info)
+        res["source_filters"] = source_filters
         res["dataset"] = {}
 
         lang = request.query_params.get("lang", "en")

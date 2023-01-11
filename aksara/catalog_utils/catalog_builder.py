@@ -151,4 +151,4 @@ def catalog_operation(operation, op_method):
             cron_utils.extract_zip(res["file_name"], dir_name)
             catalog_update(operation, op_method)
     except Exception as e:
-        print(e)
+        triggers.send_telegram(str(e))
