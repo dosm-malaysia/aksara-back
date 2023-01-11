@@ -133,28 +133,36 @@ class DATA_CATALOG(APIView):
                 "catalog_subcategory_name",
             )
         else:
-            info = CatalogJson.objects.all().values(
-                "id",
-                "catalog_name",
-                "catalog_category",
-                "catalog_category_name",
-                "catalog_subcategory_name",
-            )
+            catalog_list = cache.get("catalog_list")
 
-        filter_sources_distinct = CatalogJson.objects.values("data_source").distinct()
-        source_filters = []
-
-        for x in filter_sources_distinct:
-            if "|" in x["data_source"]:
-                sources = x["data_source"].split(" | ")
-                for s in sources:
-                    source_filters.append(s)
+            if catalog_list:
+                print("Catalog from cache")
+                info = catalog_list
             else:
-                source_filters.append(x["data_source"])
+                print("Catalog NOT from cache")
+                info = list(
+                    CatalogJson.objects.all().values(
+                        "id",
+                        "catalog_name",
+                        "catalog_category",
+                        "catalog_category_name",
+                        "catalog_subcategory_name",
+                    )
+                )
+                cache.set("catalog_list", info)
 
         res = {}
         res["total_all"] = len(info)
-        res["source_filters"] = source_filters
+        if cache.get("source_filters"):
+            print("Source filters from Cache")
+            res["source_filters"] = cache.get("source_filters")
+        else:
+            print("Source filters NOT from Cache")
+            source_filters = cron_utils.source_filters_cache()
+            res["source_filters"] = source_filters
+            cache.set("source_filters", source_filters)
+        # res["source_filters"] = cache.get('source_filters') if cache.get('source_filters') else cron_utils.source_filters_cache()
+
         res["dataset"] = {}
 
         lang = request.query_params.get("lang", "en")
@@ -163,7 +171,7 @@ class DATA_CATALOG(APIView):
         if lang not in lang_mapping:
             lang = "en"
 
-        for item in info.iterator():
+        for item in info:
             category = item["catalog_category_name"].split(" | ")[lang_mapping[lang]]
             sub_category = item["catalog_subcategory_name"].split(" | ")[
                 lang_mapping[lang]
@@ -295,8 +303,12 @@ def data_variable_handler(param_list):
     info = cache.get(var_id)
 
     if not info:
+        print("Variable NOT from cache")
         info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
         info = info[0]["catalog_data"]
+        cache.set(var_id, info)
+    else:  # Delete After
+        print("Variable from Cache")
 
     chart_type = info["API"]["chart_type"]
 

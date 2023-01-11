@@ -7,6 +7,10 @@ from aksara.utils import data_utils
 from aksara.utils import common
 from aksara.catalog_utils import catalog_builder
 
+from django.core.cache import cache
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+
 from aksara.models import CatalogJson, MetaJson, DashboardJson
 from django.apps import apps
 
@@ -180,6 +184,19 @@ def selective_update():
             operation = "UPDATE " + file_list
             catalog_builder.catalog_update(operation, "AUTO")
 
+            # Update Cache Here
+            source_filters_cache()
+            catalog_list = list(
+                CatalogJson.objects.all().values(
+                    "id",
+                    "catalog_name",
+                    "catalog_category",
+                    "catalog_category_name",
+                    "catalog_subcategory_name",
+                )
+            )
+            cache.set("catalog_list", catalog_list)
+
         # Delete all file src
         os.remove("repo.zip")
         shutil.rmtree("AKSARA_SRC/")
@@ -247,3 +264,25 @@ def revalidate_frontend(dashboard):
     response = requests.post(url, headers=headers, data=body)
 
     return response.status_code
+
+
+"""
+Set Source Filters Cache
+"""
+
+
+def source_filters_cache():
+    filter_sources_distinct = CatalogJson.objects.values("data_source").distinct()
+    source_filters = []
+
+    for x in filter_sources_distinct:
+        if "|" in x["data_source"]:
+            sources = x["data_source"].split(" | ")
+            for s in sources:
+                source_filters.append(s)
+        else:
+            source_filters.append(x["data_source"])
+
+    cache.set("source_filters", source_filters)
+
+    return source_filters
