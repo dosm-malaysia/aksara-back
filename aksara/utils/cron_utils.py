@@ -7,6 +7,8 @@ from aksara.utils import data_utils
 from aksara.utils import common
 from aksara.catalog_utils import catalog_builder
 
+from aksara.api_handling import cache_search
+
 from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
@@ -196,6 +198,7 @@ def selective_update():
                 )
             )
             cache.set("catalog_list", catalog_list)
+            # cache_search.set_filter_cache()
 
         # Delete all file src
         os.remove("repo.zip")
