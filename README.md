@@ -16,6 +16,7 @@ The backend API for OpenDOSM that serves data available via [`dosm-malaysia/aksa
 - [Meta Jsons version 1.0](#meta-jsons)
 - [Catalog Jsons version 1.0](#catalog-jsons)
 - [Chart Builders version 1.0](#chart-builders)
+- [Contributing](#contributing)
 
 
 ## Setup virtual environment
@@ -65,11 +66,12 @@ As of now, OpenDOSM uses GitHub Actions to trigger a rebuild (when there is new 
 - Using POST method
   - A post request can be sent to the endpoint `https://<your url here>/update/` , which would by default trigger an update, and populate the DB with the new data.
 - Using command line
-  - Alternatively, if your desired cron / task scheduler runs locally, you could use the command line to trigger an update and populate the DB with the new data.
-  > python manage.py loader ***category*** ***operation*** ***files***
-  - `category` - Possible values are either `DASHBOARDS` or `DATA_CATALOG`, depending on whichever you choose to update.
-  - `operation` - Possible values are either `UPDATE` or `REBUILD`. `UPDATE` will update the datasets, by inserting new rows, or updating existing rows by their ID. Whereas `REBUILD` would delete all rows from the database, and populate from an empty database.
-  - `files` - When using the `UPDATE` operation, will update specific files of your choice. The values must be a string, concatenated with a `,` dividing each dataset. E.g : `'meta_1,meta_2,meta_3'`. There is no need to add the additional `.json` suffix. This parameter is optional, and if left empty, will update every existing dataset of the chosen category.
+  * Alternatively, if your desired cron / task scheduler runs locally, you could use the command line to trigger an update and populate the DB with the new data.
+    > python manage.py loader ***category*** ***operation*** ***files***
+
+  * `category` - Possible values are either `DASHBOARDS` or `DATA_CATALOG`, depending on whichever you choose to update.
+  * `operation` - Possible values are either `UPDATE` or `REBUILD`. `UPDATE` will update the datasets, by inserting new rows, or updating existing rows by their ID. Whereas `REBUILD` would delete all rows from the database, and populate from an empty database.
+  * `files` - When using the `UPDATE` operation, will update specific files of your choice. The values must be a string, concatenated with a `,` dividing each dataset. E.g : `'meta_1,meta_2,meta_3'`. There is no need to add the additional `.json` suffix. This parameter is optional, and if left empty, will update every existing dataset of the chosen category.
 
 ## Private tokens required:
 - GitHub token -  Required for interacting with the GitHub API to pull data from the `aksara-data` repo.
@@ -111,3 +113,6 @@ Critical design principle: All charts of the same type should be built using onl
 - Within the `utils` folder in the project, the `chart_builder` file contains several methods for various charts, such as heatmaps, bar charts, choropleths, etc.
 - As long as sufficient information is supplied (by the META Json), the chart builder can dynamically format a chart's api, thus requiring minimal to no 'hard-coding'. This increases versatility.
 - Variable structures and data-types, of each chart type can be viewed in the `variable_structures.py` file, within the `utils` folder.
+
+## Contributing
+Pull requests are welcome. For any pull request, please make sure to either create a new branch, or submit a pull request to the `dev` branch. Please make sure to briefly describe the changes introduced in the pull request.
