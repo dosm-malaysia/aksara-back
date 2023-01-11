@@ -13,7 +13,7 @@ from django.db.models import Q
 from aksara.utils import cron_utils, triggers
 from aksara.serializers import MetaSerializer, DashboardSerializer, CatalogSerializer
 from aksara.models import MetaJson, DashboardJson, CatalogJson
-from aksara.api_handling import handle
+from aksara.api_handling import handle, cache_search
 
 from threading import Thread
 
@@ -124,7 +124,12 @@ class DATA_CATALOG(APIView):
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
         info = ""
+
         if len(filters) > 0:
+            # search_cache = cache.get("search_cache")
+            # filter_list = cache_search.filter_options(param_list)
+            # info = cache_search.filter_cache(filter_list, search_cache)
+
             info = CatalogJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
@@ -136,10 +141,8 @@ class DATA_CATALOG(APIView):
             catalog_list = cache.get("catalog_list")
 
             if catalog_list:
-                print("Catalog from cache")
                 info = catalog_list
             else:
-                print("Catalog NOT from cache")
                 info = list(
                     CatalogJson.objects.all().values(
                         "id",
@@ -154,10 +157,8 @@ class DATA_CATALOG(APIView):
         res = {}
         res["total_all"] = len(info)
         if cache.get("source_filters"):
-            print("Source filters from Cache")
             res["source_filters"] = cache.get("source_filters")
         else:
-            print("Source filters NOT from Cache")
             source_filters = cron_utils.source_filters_cache()
             res["source_filters"] = source_filters
             cache.set("source_filters", source_filters)
@@ -226,8 +227,6 @@ def get_filters_applied(param_list):
         elif k == "geographic":
             for i in v:
                 query |= Q(geographic__contains=i)
-        elif k == "dataset_range":
-            query &= Q(dataset_range__contains=v)
         elif k == "source":
             query &= Q(data_source__in=tuple(v))
         elif k == "search":
@@ -303,12 +302,9 @@ def data_variable_handler(param_list):
     info = cache.get(var_id)
 
     if not info:
-        print("Variable NOT from cache")
         info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
         info = info[0]["catalog_data"]
         cache.set(var_id, info)
-    else:  # Delete After
-        print("Variable from Cache")
 
     chart_type = info["API"]["chart_type"]
 
