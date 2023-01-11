@@ -68,6 +68,9 @@ class Table(GeneralChartsUtil):
         if EXCLUDE:
             df = df.drop(EXCLUDE, axis=1)
 
+        if "date" in df.columns:
+            df["date"] = df["date"].astype(str)
+
         res["data"] = df.to_dict("records")
         res["columns"] = {"en": {}, "bm": {}}
 

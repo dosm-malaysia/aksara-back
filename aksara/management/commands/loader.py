@@ -22,6 +22,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         category = kwargs["operation"][0]
         operation = kwargs["operation"][1]
+        command = operation
 
         if len(kwargs["operation"]) > 2:
             files = kwargs["operation"][2]
