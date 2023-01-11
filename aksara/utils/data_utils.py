@@ -86,7 +86,7 @@ def rebuild_dashboard_charts(operation, op_method):
     meta_json_list = []
 
     dashboard_list = set()
-    failed_notify = {}
+    failed_notify = []
 
     if operation == "REBUILD":
         DashboardJson.objects.all().delete()
@@ -133,7 +133,7 @@ def rebuild_dashboard_charts(operation, op_method):
                     obj.save()
                     cache.set(dbd_name + "_" + k, res)
             except Exception as e:
-                failed_notify[meta] = False
+                failed_notify.append(meta)
                 failed_obj = {}
                 failed_obj["CHART_NAME"] = chart_name
                 failed_obj["DASHBOARD"] = dbd_name
