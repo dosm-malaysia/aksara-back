@@ -65,7 +65,11 @@ As of now, OpenDOSM uses GitHub Actions to trigger a rebuild (when there is new 
 - Using POST method
   - A post request can be sent to the endpoint `https://<your url here>/update/` , which would by default trigger an update, and populate the DB with the new data.
 - Using command line
-  - Alternatively, if your desired cron / task scheduler runs locally, you could use the command `python manage.py loader UPDATE` , to trigger an update and populate the DB with the new data.
+  - Alternatively, if your desired cron / task scheduler runs locally, you could use the command line to trigger an update and populate the DB with the new data.
+  > python manage.py loader ***category*** ***operation*** ***files***
+  - `category` - Possible values are either `DASHBOARDS` or `DATA_CATALOG`, depending on whichever you choose to update.
+  - `operation` - Possible values are either `UPDATE` or `REBUILD`. `UPDATE` will update the datasets, by inserting new rows, or updating existing rows by their ID. Whereas `REBUILD` would delete all rows from the database, and populate from an empty database.
+  - `files` - When using the `UPDATE` operation, will update specific files of your choice. The values must be a string, concatenated with a `,` dividing each dataset. E.g : `'meta_1,meta_2,meta_3'`. There is no need to add the additional `.json` suffix. This parameter is optional, and if left empty, will update every existing dataset of the chosen category.
 
 ## Private tokens required:
 - GitHub token -  Required for interacting with the GitHub API to pull data from the `aksara-data` repo.
