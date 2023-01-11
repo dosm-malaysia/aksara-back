@@ -17,6 +17,7 @@ FRONTEND_ENDPOINTS = {
     "consumer_price_index": "CONSUMER_PRICES",
     "producer_price_index": "PRODUCER_PRICES",
     "international_reserves": "INTERNATIONAL_RESERVES",
+    "homepage": "HOME",
 }
 
 REFRESH_VARIABLES = {
