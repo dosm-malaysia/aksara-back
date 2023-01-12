@@ -45,7 +45,12 @@ class GeneralChartsUtil:
         self.meta_data = meta_data  # a.k.a current data ( cur_data )
         self.variable_data = variable_data
         self.all_variable_data = all_variable_data
-        self.read_from = file_data["link_parquet"]
+
+        if "link_preview" in file_data:
+            self.read_from = file_data["link_preview"]
+        else:
+            self.read_from = file_data["link_parquet"]
+
         self.file_src = file_src
 
         self.cur_id = meta_data["id"]
