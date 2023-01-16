@@ -290,6 +290,9 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type == "TABLE":
         intro = data["chart_details"]["intro"]
         return {"table_data": data["chart_details"]["chart"], "intro": intro}
+    elif chart_type == "GEOJSON":
+        intro = data["chart_details"]["intro"]
+        return {"intro": intro}
 
 
 """

@@ -6,6 +6,7 @@ from aksara.catalog_utils import general_helper as gh
 from aksara.catalog_utils.catalog_variable_classes import Timeseries as tm
 from aksara.catalog_utils.catalog_variable_classes import Choropleth as ch
 from aksara.catalog_utils.catalog_variable_classes import Table as tb
+from aksara.catalog_utils.catalog_variable_classes import Geojson as gj
 
 from aksara.utils import cron_utils, data_utils, triggers
 from aksara.models import CatalogJson
@@ -48,8 +49,6 @@ def catalog_update(operation, op_method):
                 failed_builds = []
                 all_builds = []
 
-                # print("FILE_SRC : " + file_src)
-
                 for cur_data in catalog_data:
                     try:
                         chart_type = cur_data["chart"]["chart_type"]
@@ -58,7 +57,7 @@ def catalog_update(operation, op_method):
                         # variable_data = all_variable_data[ cur_data['id'] - 1 ]
 
                         for var in all_variable_data:
-                            if chart_type == "TABLE":
+                            if chart_type in ["TABLE", "GEOJSON"]:
                                 if var["id"] == 0:
                                     variable_data = var
                                     break
@@ -88,6 +87,15 @@ def catalog_update(operation, op_method):
                         elif chart_type == "TABLE":
                             # variable_data = all_variable_data[0]
                             obj = tb.Table(
+                                full_meta,
+                                file_data,
+                                cur_data,
+                                variable_data,
+                                all_variable_data,
+                                file_src,
+                            )
+                        elif chart_type == "GEOJSON":
+                            obj = gj.Geojson(
                                 full_meta,
                                 file_data,
                                 cur_data,
