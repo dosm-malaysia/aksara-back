@@ -48,7 +48,7 @@ class GeneralChartsUtil:
 
         if "link_preview" in file_data:
             self.read_from = file_data["link_preview"]
-        else:
+        elif "link_parquet" in file_data:
             self.read_from = file_data["link_parquet"]
 
         self.file_src = file_src
@@ -113,8 +113,12 @@ class GeneralChartsUtil:
         res["metadata"]["in_dataset"] = []
         res["metadata"]["out_dataset"] = []
         res["metadata"]["url"] = {}
-        res["metadata"]["url"]["csv"] = file["link_csv"]
-        res["metadata"]["url"]["parquet"] = file["link_parquet"]
+        res["metadata"]["url"]["csv"] = (
+            "" if "link_csv" not in file else file["link_csv"]
+        )
+        res["metadata"]["url"]["parquet"] = (
+            "" if "link_parquet" not in file else file["link_parquet"]
+        )
         for v in self.all_variable_data:
             if v["id"] != -1:
                 v["unique_id"] = (
@@ -138,8 +142,10 @@ class GeneralChartsUtil:
     def build_downloads_info(self, file):
         res = {}
         res["downloads"] = {}
-        res["downloads"]["csv"] = file["link_csv"]
-        res["downloads"]["parquet"] = file["link_parquet"]
+        res["downloads"]["csv"] = "" if "link_csv" not in file else file["link_csv"]
+        res["downloads"]["parquet"] = (
+            "" if "link_parquet" not in file else file["link_parquet"]
+        )
         return res["downloads"]
 
     """
@@ -268,9 +274,6 @@ class GeneralChartsUtil:
                 "category_bm",
                 "file_name",
                 "bucket",
-                "link_parquet",
-                "link_csv",
-                "link_metadata",
                 "description",
             ],
             src,
@@ -283,9 +286,6 @@ class GeneralChartsUtil:
                 "category_bm",
                 "file_name",
                 "bucket",
-                "link_parquet",
-                "link_csv",
-                "link_metadata",
             ],
             "dict": ["description"],
         }
