@@ -152,11 +152,16 @@ class Timeseries(GeneralChartsUtil):
             if range in self.group_time:
                 key_list_mod = self.t_keys[:] if self.t_keys else []
                 key_list_mod.append("interval")
-                range_df["interval"] = (
-                    range_df["date"]
-                    .dt.to_period(self.group_time[range])
-                    .dt.to_timestamp()
-                )
+
+                if self.frequency != "WEEKLY":
+                    range_df["interval"] = (
+                        range_df["date"]
+                        .dt.to_period(self.group_time[range])
+                        .dt.to_timestamp()
+                    )
+                else:
+                    range_df["interval"] = range_df["date"]
+
                 range_df["interval"] = (
                     range_df["interval"].values.astype(np.int64) // 10**6
                 )
