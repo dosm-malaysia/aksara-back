@@ -104,7 +104,7 @@ def data_operation(operation, op_method):
 
 
 def get_latest_info_git(type, commit_id):
-    url = "https://api.github.com/repos/dosm-malaysia/aksara-data/commits/main"
+    url = os.getenv("GITHUB_SHA_URL", "-")
     headers_accept = "application/vnd.github.VERSION.sha"
 
     git_token = os.getenv("GITHUB_TOKEN", "-")
