@@ -104,13 +104,14 @@ def data_operation(operation, op_method):
 
 
 def get_latest_info_git(type, commit_id):
-    url = os.getenv("GITHUB_SHA_URL", "-")
+    sha_ext = os.getenv("GITHUB_SHA_URL", "-")
+    url = "https://api.github.com/repos/dosm-malaysia/aksara-data/commits/" + sha_ext
     headers_accept = "application/vnd.github.VERSION.sha"
 
     git_token = os.getenv("GITHUB_TOKEN", "-")
 
     if type == "COMMIT":
-        url = url.replace("main", "")
+        url = url.replace(sha_ext, "")
         url += commit_id
         headers_accept = "application/vnd.github+json"
 
