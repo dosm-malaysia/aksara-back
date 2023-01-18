@@ -23,14 +23,14 @@ FRONTEND_ENDPOINTS = {
 REFRESH_VARIABLES = {
     "MetaJson": {
         "column_name": "dashboard_name",
-        "directory": "AKSARA_SRC/aksara-data-main/dashboards/",
+        "directory": "/dashboards/",
     },
     "DashboardJson": {
         "column_name": "dashboard_name",
-        "directory": "AKSARA_SRC/aksara-data-main/dashboards/",
+        "directory": "/dashboards/",
     },
     "CatalogJson": {
         "column_name": "file_src",
-        "directory": "AKSARA_SRC/aksara-data-main/catalog/",
+        "directory": "/catalog/",
     },
 }

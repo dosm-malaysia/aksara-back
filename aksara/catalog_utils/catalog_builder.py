@@ -22,7 +22,9 @@ def catalog_update(operation, op_method):
     operation = opr_data["operation"]
     meta_files = opr_data["files"]
 
-    META_DIR = os.path.join(os.getcwd(), "AKSARA_SRC/aksara-data-main/catalog/")
+    META_DIR = os.path.join(
+        os.getcwd(), "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/catalog/"
+    )
 
     if operation == "REBUILD":
         CatalogJson.objects.all().delete()
@@ -35,7 +37,8 @@ def catalog_update(operation, op_method):
     for meta in meta_files:
         try:
             FILE_META = os.path.join(
-                os.getcwd(), "AKSARA_SRC/aksara-data-main/catalog/" + meta
+                os.getcwd(),
+                "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/catalog/" + meta,
             )
 
             if pathlib.Path(meta).suffix == ".json":
@@ -145,7 +148,7 @@ def catalog_operation(operation, op_method):
     try:
         dir_name = "AKSARA_SRC"
         zip_name = "repo.zip"
-        git_url = "https://github.com/dosm-malaysia/aksara-data/archive/main.zip"
+        git_url = os.getenv("GITHUB_URL", "-")
         git_token = os.getenv("GITHUB_TOKEN", "-")
 
         cron_utils.create_directory(dir_name)

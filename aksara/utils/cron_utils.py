@@ -87,7 +87,7 @@ such as update or rebuild
 def data_operation(operation, op_method):
     dir_name = "AKSARA_SRC"
     zip_name = "repo.zip"
-    git_url = "https://github.com/dosm-malaysia/aksara-data/archive/main.zip"
+    git_url = os.env("GITHUB_URL", "-")
     git_token = os.getenv("GITHUB_TOKEN", "-")
 
     triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
@@ -127,7 +127,7 @@ def get_latest_info_git(type, commit_id):
 def selective_update():
     dir_name = "AKSARA_SRC"
     zip_name = "repo.zip"
-    git_url = "https://github.com/dosm-malaysia/aksara-data/archive/main.zip"
+    git_url = os.getenv("GITHUB_URL", "-")
     git_token = os.getenv("GITHUB_TOKEN", "-")
 
     triggers.send_telegram("--- PERFORMING SELECTIVE UPDATE ---")
@@ -217,7 +217,7 @@ def filter_changed_files(file_list):
     changed_files = {"dashboards": [], "catalog": []}
 
     for f in file_list:
-        f_path = "AKSARA_SRC/aksara-data-main/" + f
+        f_path = "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
         f_info = f.split("/")
         if len(f_info) > 1 and f_info[0] in changed_files and os.path.exists(f_path):
             changed_files[f_info[0]].append(f_info[1])
@@ -237,7 +237,9 @@ def remove_deleted_files():
             m[v["column_name"]]
             for m in model_name.objects.values(v["column_name"]).distinct()
         ]
-        DIR = os.path.join(os.getcwd(), v["directory"])
+        DIR = os.path.join(
+            os.getcwd(), "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + v["directory"]
+        )
         distinct_dir = [
             f.replace(".json", "") for f in listdir(DIR) if isfile(join(DIR, f))
         ]
