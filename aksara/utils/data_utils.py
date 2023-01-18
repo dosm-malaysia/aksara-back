@@ -28,7 +28,9 @@ def rebuild_dashboard_meta(operation, op_method):
     operation = opr_data["operation"]
     meta_files = opr_data["files"]
 
-    META_DIR = os.path.join(os.getcwd(), "AKSARA_SRC/aksara-data-main/dashboards/")
+    META_DIR = os.path.join(
+        os.getcwd(), "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/dashboards/"
+    )
 
     if operation == "REBUILD":
         MetaJson.objects.all().delete()
