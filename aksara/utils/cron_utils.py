@@ -246,8 +246,22 @@ def remove_deleted_files():
         diff = list(set(distinct_db) - set(distinct_dir))
 
         if diff:
+            # Remove the deleted datasets
             query = {v["column_name"] + "__in": diff}
             model_name.objects.filter(**query).delete()
+
+    # Update the cache
+    source_filters_cache()
+    catalog_list = list(
+        CatalogJson.objects.all().values(
+            "id",
+            "catalog_name",
+            "catalog_category",
+            "catalog_category_name",
+            "catalog_subcategory_name",
+        )
+    )
+    cache.set("catalog_list", catalog_list)
 
 
 """
