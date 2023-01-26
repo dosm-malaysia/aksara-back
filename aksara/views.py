@@ -246,39 +246,31 @@ Handles the data-variable queries, by chart applied
 
 def data_variable_chart_handler(data, chart_type, param_list):
     if chart_type == "TIMESERIES":
-        filter = ""
-        range = ""
+        defaults_api = {}
 
-        for i in data["API"]["filters"]:
-            if i["key"] == "filter":
-                filter = i["default"]["value"]
-            elif i["key"] == "range":
-                range = i["default"]["value"]
+        for d in data["API"]["filters"]:
+            defaults_api[d["key"]] = d["default"]["value"]
 
-        if "filter" in param_list:
-            filter = param_list["filter"][0]
+        intro_data = data["chart_details"]["intro"]
+        table_data = data["chart_details"]["chart"]
+        chart_data = data["chart_details"]["chart"]
 
-        if "range" in param_list:
-            range = param_list["range"][0]
+        for k, v in defaults_api.items():
+            key = param_list[k][0] if k in param_list else v
+            if key in chart_data:
+                chart_data = chart_data[key]
+                if k == "range":
+                    table_vals = table_data["TABLE"]["data"][key]
+                    table_cols = table_data["TABLE"]["columns"]
+                    table_data = {"columns": table_cols, "data": table_vals}
+                else:
+                    table_data = table_data[key]
+            else:
+                chart_data = {}
+                table_data = {}
+                break
 
-        table_data = {}
-
-        if filter:
-            table_data["columns"] = data["chart_details"]["chart"][filter]["TABLE"][
-                "columns"
-            ]
-            table_data["data"] = data["chart_details"]["chart"][filter]["TABLE"][
-                "data"
-            ][range]
-            chart_data = data["chart_details"]["chart"][filter][range]
-            intro = data["chart_details"]["intro"]
-        else:
-            table_data["columns"] = data["chart_details"]["chart"]["TABLE"]["columns"]
-            table_data["data"] = data["chart_details"]["chart"]["TABLE"]["data"][range]
-            chart_data = data["chart_details"]["chart"][range]
-            intro = data["chart_details"]["intro"]
-
-        return {"chart_data": chart_data, "table_data": table_data, "intro": intro}
+        return {"chart_data": chart_data, "table_data": table_data, "intro": intro_data}
     elif chart_type == "CHOROPLETH":
         if "filters" not in data["API"]:
             table_data = {}
@@ -293,6 +285,32 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type == "GEOJSON":
         intro = data["chart_details"]["intro"]
         return {"intro": intro}
+    elif chart_type == "BAR" or chart_type == "HBAR":
+        defaults_api = {}
+
+        for d in data["API"]["filters"]:
+            defaults_api[d["key"]] = d["default"]["value"]
+
+        intro = data["chart_details"]["intro"]  # Get intro
+        tbl_data = data["chart_details"]["chart"]["table_data"]  # Get tbl data
+        tbl_header = data["chart_details"]["chart"]["table_data"]["tbl_columns"]
+        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
+
+        for k, v in defaults_api.items():
+            key = param_list[k][0] if k in param_list else v
+            if key in tbl_data and key in chart:
+                tbl_data = tbl_data[key]
+                chart = chart[key]
+            else:
+                tbl_data = {}
+                chart = {}
+                break
+
+        tbl = {"columns": tbl_header, "data": tbl_data}
+
+        res = {"chart_data": chart, "table_data": tbl, "intro": intro}
+
+        return res
 
 
 """

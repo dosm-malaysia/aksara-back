@@ -293,16 +293,16 @@ Set Source Filters Cache
 
 def source_filters_cache():
     filter_sources_distinct = CatalogJson.objects.values("data_source").distinct()
-    source_filters = []
+    source_filters = set()
 
     for x in filter_sources_distinct:
         if "|" in x["data_source"]:
             sources = x["data_source"].split(" | ")
             for s in sources:
-                source_filters.append(s)
+                source_filters.add(s)
         else:
-            source_filters.append(x["data_source"])
+            source_filters.add(x["data_source"])
 
-    cache.set("source_filters", source_filters)
+    cache.set("source_filters", list(source_filters))
 
-    return source_filters
+    return list(source_filters)

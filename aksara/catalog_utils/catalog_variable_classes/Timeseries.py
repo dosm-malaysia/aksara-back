@@ -13,7 +13,7 @@ class Timeseries(GeneralChartsUtil):
     chart_type = "TIMESERIES"
 
     # API related fields
-    api_filter = ""
+    api_filter = []
 
     # Timeseries related fields
     frequency = ""
@@ -63,7 +63,7 @@ class Timeseries(GeneralChartsUtil):
         self.validate_meta_json()
 
         if meta_data["chart"]["chart_filters"]["SLICE_BY"]:
-            self.api_filter = meta_data["chart"]["chart_filters"]["SLICE_BY"][0]
+            self.api_filter = meta_data["chart"]["chart_filters"]["SLICE_BY"]
         else:
             self.api_filter = []
 
@@ -299,17 +299,18 @@ class Timeseries(GeneralChartsUtil):
         api_filters_inc = []
 
         if self.api_filter:
-            fe_vals = df[self.api_filter].unique().tolist()
-            be_vals = (
-                df[self.api_filter]
-                .apply(lambda x: x.lower().replace(" ", "-"))
-                .unique()
-                .tolist()
-            )
-            filter_obj = self.build_api_object_filter(
-                "filter", fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals))
-            )
-            api_filters_inc.append(filter_obj)
+            for api in self.api_filter:
+                fe_vals = df[api].unique().tolist()
+                be_vals = (
+                    df[api]
+                    .apply(lambda x: x.lower().replace(" ", "-"))
+                    .unique()
+                    .tolist()
+                )
+                filter_obj = self.build_api_object_filter(
+                    api, fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals))
+                )
+                api_filters_inc.append(filter_obj)
 
         range_options = [
             {"label": self.timeseries_values[r], "value": r}
