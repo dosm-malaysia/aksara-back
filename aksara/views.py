@@ -293,6 +293,28 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type == "GEOJSON":
         intro = data["chart_details"]["intro"]
         return {"intro": intro}
+    elif chart_type == "BAR" or chart_type == "HBAR":
+        defaults_api = {}
+
+        for d in data["API"]["filters"]:
+            defaults_api[d["key"]] = d["default"]["value"]
+
+        intro = data["chart_details"]["intro"]  # Get intro
+        tbl = data["chart_details"]["chart"]["table_data"]  # Get tbl data
+        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
+
+        for k, v in defaults_api.items():
+            if k in param_list:
+                key = param_list[k][0]
+                tbl = tbl[key]
+                chart = chart[key]
+            else:
+                tbl = tbl[v]
+                chart = chart[v]
+
+        res = {"chart_data": chart, "table_data": tbl, "intro": intro}
+
+        return res
 
 
 """
