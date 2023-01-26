@@ -300,17 +300,20 @@ def data_variable_chart_handler(data, chart_type, param_list):
             defaults_api[d["key"]] = d["default"]["value"]
 
         intro = data["chart_details"]["intro"]  # Get intro
-        tbl = data["chart_details"]["chart"]["table_data"]  # Get tbl data
+        tbl_data = data["chart_details"]["chart"]["table_data"]  # Get tbl data
+        tbl_header = data["chart_details"]["chart"]["table_data"]["tbl_columns"]
         chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
 
         for k, v in defaults_api.items():
             if k in param_list:
                 key = param_list[k][0]
-                tbl = tbl[key]
+                tbl_data = tbl_data[key]
                 chart = chart[key]
             else:
-                tbl = tbl[v]
+                tbl_data = tbl_data[v]
                 chart = chart[v]
+
+        tbl = {"columns": tbl_header, "data": tbl_data}
 
         res = {"chart_data": chart, "table_data": tbl, "intro": intro}
 

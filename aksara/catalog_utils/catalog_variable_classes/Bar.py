@@ -74,6 +74,12 @@ class Bar(GeneralChartsUtil):
         overall = {}
         res = {}
         table_res = {}
+        table_res["tbl_columns"] = {
+            "x_en": self.b_x,
+            "y_en": self.b_y,
+            "x_bm": self.b_x,
+            "y_bm": self.b_y,
+        }
 
         for group in u_groups_list:
             result = {}
