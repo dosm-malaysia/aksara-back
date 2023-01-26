@@ -305,4 +305,4 @@ def source_filters_cache():
 
     cache.set("source_filters", list(source_filters))
 
-    return source_filters
+    return list(source_filters)
