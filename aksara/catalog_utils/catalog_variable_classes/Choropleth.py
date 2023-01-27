@@ -69,7 +69,6 @@ class Choropleth(GeneralChartsUtil):
     def build_chart(self):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
-        temp_df = ""
         res = {}
         tbl_res = {}
 
@@ -84,7 +83,6 @@ class Choropleth(GeneralChartsUtil):
         if parent:
             df["u_groups"] = list(df[parent].itertuples(index=False, name=None))
             u_groups_list = df["u_groups"].unique().tolist()
-
             for group in u_groups_list:
                 result = {}
                 tbl = {}
@@ -94,7 +92,7 @@ class Choropleth(GeneralChartsUtil):
                 group_l = [group[0]] if len(group) == 1 else list(group)
                 group = group[0] if len(group) == 1 else group
                 temp_df = df.groupby(parent).get_group(group)[[x, y]]
-                temp_df = df[[x, y]].rename(columns={x: "id", y: "value"})
+                temp_df = temp_df[[x, y]].rename(columns={x: "id", y: "value"})
                 c_data = temp_df.to_dict("records")
                 tbl_data = temp_df.rename(columns={"id": "x", "value": "y"}).to_dict(
                     "records"
