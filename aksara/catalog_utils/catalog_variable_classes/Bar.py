@@ -68,6 +68,9 @@ class Bar(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
 
+        for key in self.b_keys:
+            df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
+
         df["u_groups"] = list(df[self.b_keys].itertuples(index=False, name=None))
         u_groups_list = df["u_groups"].unique().tolist()
 
