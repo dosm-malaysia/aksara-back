@@ -52,6 +52,11 @@ class Choropleth(GeneralChartsUtil):
         self.c_format = self.meta_data["chart"]["chart_variables"]["format"]
 
         self.api_filter = meta_data["chart"]["chart_filters"]["SLICE_BY"]
+        self.precision = (
+            meta_data["chart"]["chart_filters"]["precision"]
+            if "precision" in meta_data["chart"]["chart_filters"]
+            else 1
+        )
         self.api = self.build_api_info()
 
         self.chart_name = {
@@ -143,6 +148,7 @@ class Choropleth(GeneralChartsUtil):
         res = {}
 
         res["API"] = {}
+        res["API"]["precision"] = self.precision
         res["API"]["chart_type"] = self.meta_data["chart"]["chart_type"]
         res["API"]["color"] = self.c_color
         res["API"]["file_json"] = self.c_file_json

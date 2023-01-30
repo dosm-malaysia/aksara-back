@@ -46,6 +46,11 @@ class Bar(GeneralChartsUtil):
 
         self.chart_type = meta_data["chart"]["chart_type"]
         self.api_filter = meta_data["chart"]["chart_filters"]["SLICE_BY"]
+        self.precision = (
+            meta_data["chart"]["chart_filters"]["precision"]
+            if "precision" in meta_data["chart"]["chart_filters"]
+            else 1
+        )
 
         self.api = self.build_api_info()
 
@@ -136,6 +141,7 @@ class Bar(GeneralChartsUtil):
 
         res["API"] = {}
         res["API"]["filters"] = api_filters_inc
+        res["API"]["precision"] = self.precision
         res["API"]["chart_type"] = self.meta_data["chart"]["chart_type"]
 
         return res["API"]

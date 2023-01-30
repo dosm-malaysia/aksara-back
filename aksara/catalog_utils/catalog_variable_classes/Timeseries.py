@@ -67,6 +67,11 @@ class Timeseries(GeneralChartsUtil):
         else:
             self.api_filter = []
 
+        self.precision = (
+            meta_data["chart"]["chart_filters"]["precision"]
+            if "precision" in meta_data["chart"]["chart_filters"]
+            else 1
+        )
         self.frequency = meta_data["catalog_filters"]["frequency"]
         self.limit_frequency = (
             meta_data["catalog_filters"]["limit_frequency"]
@@ -326,6 +331,7 @@ class Timeseries(GeneralChartsUtil):
 
         res["API"] = {}
         res["API"]["filters"] = api_filters_inc
+        res["API"]["precision"] = self.precision
         res["API"]["chart_type"] = self.meta_data["chart"]["chart_type"]
 
         return res["API"]

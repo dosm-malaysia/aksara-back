@@ -47,6 +47,11 @@ class Table(GeneralChartsUtil):
         }
         self.exclude = self.meta_data["chart"]["chart_filters"]["EXCLUDE"]
         self.freeze = self.meta_data["chart"]["chart_filters"]["FREEZE"]
+        self.precision = (
+            meta_data["chart"]["chart_filters"]["precision"]
+            if "precision" in meta_data["chart"]["chart_filters"]
+            else 1
+        )
 
         self.metadata = self.rebuild_metadata()
         self.api = self.build_api()
@@ -96,6 +101,7 @@ class Table(GeneralChartsUtil):
 
     def build_api(self):
         res = {}
+        res["precision"] = self.precision
         res["freeze"] = self.freeze
         res["chart_type"] = self.chart_type
 

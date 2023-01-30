@@ -7,6 +7,8 @@ from aksara.catalog_utils import catalog_builder
 
 from django.core.cache import cache
 
+import os
+import shutil
 import environ
 
 env = environ.Env()
@@ -49,6 +51,10 @@ class Command(BaseCommand):
             "UPDATE",
             "REBUILD",
         ]:
+            # Delete all file src
+            # os.remove("repo.zip")
+            # shutil.rmtree("AKSARA_SRC/")
+            cron_utils.remove_src_folders()
             if category == "DATA_CATALOG":
                 catalog_builder.catalog_operation(command, "MANUAL")
             else:

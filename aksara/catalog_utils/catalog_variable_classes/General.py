@@ -41,6 +41,7 @@ class GeneralChartsUtil:
 
         self.general_meta_validation()
 
+        self.precision = -1
         self.file_data = file_data
         self.meta_data = meta_data  # a.k.a current data ( cur_data )
         self.variable_data = variable_data
