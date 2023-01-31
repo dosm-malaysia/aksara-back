@@ -87,7 +87,7 @@ such as update or rebuild
 def data_operation(operation, op_method):
     dir_name = "AKSARA_SRC"
     zip_name = "repo.zip"
-    git_url = os.env("GITHUB_URL", "-")
+    git_url = os.getenv("GITHUB_URL", "-")
     git_token = os.getenv("GITHUB_TOKEN", "-")
 
     triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
@@ -126,6 +126,11 @@ def get_latest_info_git(type, commit_id):
 
 
 def selective_update():
+    # Delete all file src
+    # os.remove("repo.zip")
+    # shutil.rmtree("AKSARA_SRC/")
+    remove_src_folders()
+
     dir_name = "AKSARA_SRC"
     zip_name = "repo.zip"
     git_url = os.getenv("GITHUB_URL", "-")
@@ -200,11 +205,6 @@ def selective_update():
             )
             cache.set("catalog_list", catalog_list)
             # cache_search.set_filter_cache()
-
-        # Delete all file src
-        os.remove("repo.zip")
-        shutil.rmtree("AKSARA_SRC/")
-
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
@@ -306,3 +306,15 @@ def source_filters_cache():
     cache.set("source_filters", list(source_filters))
 
     return list(source_filters)
+
+
+"""
+REMOVE SRC FOLDERS
+"""
+
+
+def remove_src_folders():
+    if os.path.exists("AKSARA_SRC") and os.path.isdir("AKSARA_SRC"):
+        shutil.rmtree("AKSARA_SRC")
+    if os.path.exists("repo.zip"):
+        os.remove("repo.zip")

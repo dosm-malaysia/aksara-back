@@ -272,13 +272,30 @@ def data_variable_chart_handler(data, chart_type, param_list):
 
         return {"chart_data": chart_data, "table_data": table_data, "intro": intro_data}
     elif chart_type == "CHOROPLETH":
-        if "filters" not in data["API"]:
-            table_data = {}
-            table_data["columns"] = data["chart_details"]["chart"]["TABLE"]["columns"]
-            table_data["data"] = data["chart_details"]["chart"]["TABLE"]["data"]
-            chart_data = data["chart_details"]["chart"]["CHART"]
-            intro = data["chart_details"]["intro"]
-            return {"chart_data": chart_data, "table_data": table_data, "intro": intro}
+        defaults_api = {}
+
+        for d in data["API"]["filters"]:
+            defaults_api[d["key"]] = d["default"]["value"]
+
+        intro = data["chart_details"]["intro"]
+        tbl_cols = data["chart_details"]["chart"]["TABLE"]["columns"]
+        table_data = data["chart_details"]["chart"]["TABLE"]["data"]
+        chart_data = data["chart_details"]["chart"]["CHART"]
+
+        for k, v in defaults_api.items():
+            key = param_list[k][0] if k in param_list else v
+            if key in table_data and key in chart_data:
+                table_data = table_data[key]
+                chart_data = chart_data[key]
+            else:
+                table_data = {}
+                chart_data = {}
+                break
+
+        tbl = {}
+        tbl["columns"] = tbl_cols
+        tbl["data"] = table_data
+        return {"chart_data": chart_data, "table_data": tbl, "intro": intro}
     elif chart_type == "TABLE":
         intro = data["chart_details"]["intro"]
         return {"table_data": data["chart_details"]["chart"], "intro": intro}

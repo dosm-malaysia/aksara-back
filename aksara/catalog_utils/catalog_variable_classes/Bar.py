@@ -19,7 +19,7 @@ class Bar(GeneralChartsUtil):
     chart_name = {}
     b_keys = []
     b_x = ""
-    b_y = ""
+    b_y = []
 
     """
     Initiailize the neccessary data for a bar chart
@@ -46,12 +46,21 @@ class Bar(GeneralChartsUtil):
 
         self.chart_type = meta_data["chart"]["chart_type"]
         self.api_filter = meta_data["chart"]["chart_filters"]["SLICE_BY"]
+        self.precision = (
+            meta_data["chart"]["chart_filters"]["precision"]
+            if "precision" in meta_data["chart"]["chart_filters"]
+            else 1
+        )
 
         self.api = self.build_api_info()
 
         self.b_keys = meta_data["chart"]["chart_variables"]["parents"]
         self.b_x = meta_data["chart"]["chart_variables"]["format"]["x"]
         self.b_y = meta_data["chart"]["chart_variables"]["format"]["y"]
+
+        if isinstance(self.b_y, str):
+            self.b_y = [self.b_y]
+
         self.chart_name = {
             "en": self.variable_data["title_en"],
             "bm": self.variable_data["title_bm"],
@@ -68,6 +77,9 @@ class Bar(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
 
+        for key in self.b_keys:
+            df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
+
         df["u_groups"] = list(df[self.b_keys].itertuples(index=False, name=None))
         u_groups_list = df["u_groups"].unique().tolist()
 
@@ -76,10 +88,15 @@ class Bar(GeneralChartsUtil):
         table_res = {}
         table_res["tbl_columns"] = {
             "x_en": self.b_x,
-            "y_en": self.b_y,
             "x_bm": self.b_x,
-            "y_bm": self.b_y,
         }
+
+        count = 1
+        for y in self.b_y:
+            for y_lang in ["en", "bm"]:
+                y_val = "y" + str(count) + "_" + y_lang
+                table_res["tbl_columns"][y_val] = y
+            count += 1
 
         for group in u_groups_list:
             result = {}
@@ -90,14 +107,28 @@ class Bar(GeneralChartsUtil):
             group_l = [group[0]] if len(group) == 1 else list(group)
             group = group[0] if len(group) == 1 else group
             x_list = df.groupby(self.b_keys)[self.b_x].get_group(group).to_list()
-            y_list = df.groupby(self.b_keys)[self.b_y].get_group(group).to_list()
+
+            rename_columns = {self.b_x: "x"}
+            chart_vals = {"x": x_list}
+            count = 1
+            for y in self.b_y:
+                y_list = df.groupby(self.b_keys)[y].get_group(group).to_list()
+                y_val = "y" + str(count)
+                rename_columns[y] = y_val
+                chart_vals[y_val] = y_list
+                count += 1
+
+            # y_list = df.groupby(self.b_keys)[self.b_y].get_group(group).to_list()
+
             table_vals = (
-                df.rename(columns={self.b_x: "x", self.b_y: "y"})
-                .groupby(self.b_keys)["x", "y"]
+                df.rename(columns=rename_columns)
+                .groupby(self.b_keys)[list(rename_columns.values())]
                 .get_group(group)
                 .to_dict("records")
             )
-            final_d = {"x": x_list, "y": y_list}
+
+            # final_d = {"x": x_list, "y": y_list}
+            final_d = chart_vals
             self.set_dict(result, group_l, final_d)
             self.set_dict(tbl, group_l, table_vals)
             merge(res, result)
@@ -133,6 +164,7 @@ class Bar(GeneralChartsUtil):
 
         res["API"] = {}
         res["API"]["filters"] = api_filters_inc
+        res["API"]["precision"] = self.precision
         res["API"]["chart_type"] = self.meta_data["chart"]["chart_type"]
 
         return res["API"]
