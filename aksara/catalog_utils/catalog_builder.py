@@ -9,6 +9,7 @@ from aksara.catalog_utils.catalog_variable_classes import Table as tb
 from aksara.catalog_utils.catalog_variable_classes import Geojson as gj
 from aksara.catalog_utils.catalog_variable_classes import Bar as bar
 from aksara.catalog_utils.catalog_variable_classes import Heatmap as hm
+from aksara.catalog_utils.catalog_variable_classes import Pyramid as py
 
 
 from aksara.utils import cron_utils, data_utils, triggers
@@ -119,6 +120,15 @@ def catalog_update(operation, op_method):
                             )
                         elif chart_type == "HEATMAP":
                             obj = hm.Heatmap(
+                                full_meta,
+                                file_data,
+                                cur_data,
+                                variable_data,
+                                all_variable_data,
+                                file_src,
+                            )
+                        elif chart_type == "PYRAMID":
+                            obj = py.Pyramid(
                                 full_meta,
                                 file_data,
                                 cur_data,
