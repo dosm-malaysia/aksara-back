@@ -64,7 +64,7 @@ def catalog_update(operation, op_method):
                         # variable_data = all_variable_data[ cur_data['id'] - 1 ]
 
                         for var in all_variable_data:
-                            if chart_type in ["TABLE", "GEOJSON"]:
+                            if chart_type in ["TABLE", "GEOJSON", "PYRAMID"]:
                                 if var["id"] == 0:
                                     variable_data = var
                                     break

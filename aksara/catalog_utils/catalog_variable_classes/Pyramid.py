@@ -63,6 +63,7 @@ class Pyramid(GeneralChartsUtil):
             "bm": self.variable_data["title_bm"],
         }
 
+        self.metadata = self.rebuild_metadata()
         self.chart_details["chart"] = self.build_chart()
         self.db_input["catalog_data"] = self.build_catalog_data_info()
 
@@ -75,6 +76,7 @@ class Pyramid(GeneralChartsUtil):
         df = df.replace({np.nan: None})
 
         for key in self.p_keys:
+            df[key] = df[key].astype(str)
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
         # Multiply the first by -1
@@ -124,8 +126,8 @@ class Pyramid(GeneralChartsUtil):
                 )
 
                 chart_data = {"x": x_list, "y1": y1_list, "y2": y2_list}
-                self.set_dict(result, group_l, chart_data, "SET")
-                self.set_dict(tbl, group_l, table_vals, "SET")
+                self.set_dict(result, group_l, chart_data)
+                self.set_dict(tbl, group_l, table_vals)
                 merge(res, result)
                 merge(tbl_res, tbl)
         else:
@@ -153,6 +155,7 @@ class Pyramid(GeneralChartsUtil):
 
         if self.api_filter:
             for api in self.api_filter:
+                df[api] = df[api].astype(str)
                 fe_vals = df[api].unique().tolist()
                 be_vals = (
                     df[api]
@@ -171,3 +174,20 @@ class Pyramid(GeneralChartsUtil):
         res["API"]["chart_type"] = self.meta_data["chart"]["chart_type"]
 
         return res["API"]
+
+    """
+    REBUILDS THE METADATA
+    """
+
+    def rebuild_metadata(self):
+        self.metadata.pop("in_dataset", None)
+
+        refresh_metadata = []
+
+        for i in self.all_variable_data:
+            if i["id"] != 0:
+                i.pop("unique_id", None)
+                refresh_metadata.append(i)
+
+        self.metadata["out_dataset"] = refresh_metadata
+        return self.metadata
