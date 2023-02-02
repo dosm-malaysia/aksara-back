@@ -328,6 +328,51 @@ def data_variable_chart_handler(data, chart_type, param_list):
         res = {"chart_data": chart, "table_data": tbl, "intro": intro}
 
         return res
+    elif chart_type == "HEATMAP":
+        defaults_api = {}
+
+        for d in data["API"]["filters"]:
+            defaults_api[d["key"]] = d["default"]["value"]
+
+        intro = data["chart_details"]["intro"]  # Get intro
+        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
+
+        for k, v in defaults_api.items():
+            key = param_list[k][0] if k in param_list else v
+            if key in chart:
+                chart = chart[key]
+            else:
+                chart = {}
+                break
+
+        res = {"chart_data": chart, "intro": intro}
+
+        return res
+    elif chart_type == "PYRAMID":
+        defaults_api = {}
+
+        for d in data["API"]["filters"]:
+            defaults_api[d["key"]] = d["default"]["value"]
+
+        intro = data["chart_details"]["intro"]  # Get intro
+        tbl_data = data["chart_details"]["chart"]["table_data"]  # Get tbl data
+        tbl_header = data["chart_details"]["chart"]["table_data"]["tbl_columns"]
+        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
+
+        for k, v in defaults_api.items():
+            key = param_list[k][0] if k in param_list else v
+            if key in tbl_data and key in chart:
+                tbl_data = tbl_data[key]
+                chart = chart[key]
+            else:
+                tbl_data = {}
+                chart = {}
+                break
+
+        tbl = {"columns": tbl_header, "data": tbl_data}
+        res = {"chart_data": chart, "table_data": tbl, "intro": intro}
+
+        return res
 
 
 """
