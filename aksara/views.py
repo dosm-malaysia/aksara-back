@@ -228,7 +228,8 @@ def get_filters_applied(param_list):
             for i in v:
                 query |= Q(geographic__contains=i)
         elif k == "source":
-            query &= Q(data_source__in=tuple(v))
+            for i in v:
+                query |= Q(data_source__contains=i)
         elif k == "search":
             query &= Q(catalog_name__icontains=v)
         if k == "begin":
