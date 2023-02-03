@@ -79,9 +79,6 @@ class Pyramid(GeneralChartsUtil):
             df[key] = df[key].astype(str)
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
-        # Multiply the first by -1
-        df[self.p_y[0]] = df[self.p_y[0]].apply(lambda x: x * -1)
-
         res = {}
         tbl_res = {}
         overall = {}
@@ -111,9 +108,12 @@ class Pyramid(GeneralChartsUtil):
                 group_l = [group[0]] if len(group) == 1 else list(group)
                 group = group[0] if len(group) == 1 else group
                 x_list = df.groupby(self.p_keys)[self.p_x].get_group(group).to_list()
-                y1_list = (
-                    df.groupby(self.p_keys)[self.p_y[0]].get_group(group).to_list()
-                )
+                y1_list = [
+                    x * -1
+                    for x in df.groupby(self.p_keys)[self.p_y[0]]
+                    .get_group(group)
+                    .to_list()
+                ]
                 y2_list = (
                     df.groupby(self.p_keys)[self.p_y[1]].get_group(group).to_list()
                 )
@@ -132,7 +132,7 @@ class Pyramid(GeneralChartsUtil):
                 merge(tbl_res, tbl)
         else:
             x_list = df[self.p_x].to_list()
-            y1_list = df[self.p_y[0]].to_list()
+            y1_list = [x * -1 for x in df[self.p_y[0]].to_list()]
             y2_list = df[self.p_y[1]].to_list()
             res = {"x": x_list, "y1": y1_list, "y2": y2_list}
             tbl_res = df.rename(columns=rename_columns)[
