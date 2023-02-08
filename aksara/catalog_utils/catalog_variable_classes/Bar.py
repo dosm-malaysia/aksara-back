@@ -14,6 +14,7 @@ class Bar(GeneralChartsUtil):
 
     # API related fields
     api_filter = []
+    translations = {}
 
     # Chart related
     chart_name = {}
@@ -54,6 +55,11 @@ class Bar(GeneralChartsUtil):
 
         self.api = self.build_api_info()
 
+        self.translations = (
+            meta_data["chart"]["chart_variables"]["format_lang"]
+            if "format_lang" in meta_data["chart"]["chart_variables"]
+            else {}
+        )
         self.b_keys = meta_data["chart"]["chart_variables"]["parents"]
         self.b_x = meta_data["chart"]["chart_variables"]["format"]["x"]
         self.b_y = meta_data["chart"]["chart_variables"]["format"]["y"]
@@ -86,17 +92,31 @@ class Bar(GeneralChartsUtil):
         overall = {}
         res = {}
         table_res = {}
-        table_res["tbl_columns"] = {
-            "x_en": self.b_x,
-            "x_bm": self.b_x,
-        }
 
-        count = 1
-        for y in self.b_y:
+        if self.translations:
+            table_res["tbl_columns"] = {
+                "x_en": self.translations["x_en"],
+                "x_bm": self.translations["x_bm"],
+            }
+
             for y_lang in ["en", "bm"]:
-                y_val = "y" + str(count) + "_" + y_lang
-                table_res["tbl_columns"][y_val] = y
-            count += 1
+                count = 1
+                for c_y in self.translations["y_" + y_lang]:
+                    y_val = "y" + str(count) + "_" + y_lang
+                    table_res["tbl_columns"][y_val] = c_y
+                    count += 1
+        else:
+            table_res["tbl_columns"] = {
+                "x_en": self.b_x,
+                "x_bm": self.b_x,
+            }
+
+            count = 1
+            for y in self.b_y:
+                for y_lang in ["en", "bm"]:
+                    y_val = "y" + str(count) + "_" + y_lang
+                    table_res["tbl_columns"][y_val] = y
+                count += 1
 
         for group in u_groups_list:
             result = {}
