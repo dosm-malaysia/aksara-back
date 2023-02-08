@@ -14,6 +14,7 @@ class Pyramid(GeneralChartsUtil):
 
     # API related fields
     api_filter = []
+    translations = {}
 
     # Chart related
     chart_name = {}
@@ -44,6 +45,11 @@ class Pyramid(GeneralChartsUtil):
             file_src,
         )
 
+        self.translations = (
+            meta_data["chart"]["chart_variables"]["format_lang"]
+            if "format_lang" in meta_data["chart"]["chart_variables"]
+            else {}
+        )
         self.chart_type = meta_data["chart"]["chart_type"]
         self.api_filter = meta_data["chart"]["chart_filters"]["SLICE_BY"]
         self.precision = (
@@ -83,17 +89,32 @@ class Pyramid(GeneralChartsUtil):
         tbl_res = {}
         overall = {}
         rename_columns = {self.p_x: "x", self.p_y[0]: "y1", self.p_y[1]: "y2"}
-        tbl_res["tbl_columns"] = {
-            "x_en": self.p_x,
-            "x_bm": self.p_x,
-        }
 
-        count = 1
-        for c_y in self.p_y:
+        if self.translations:
+            tbl_res["tbl_columns"] = {
+                "x_en": self.translations["x_en"],
+                "x_bm": self.translations["x_bm"],
+            }
+
             for y_lang in ["en", "bm"]:
-                y_val = "y" + str(count) + "_" + y_lang
-                tbl_res["tbl_columns"][y_val] = c_y
-            count += 1
+                count = 1
+                for c_y in self.translations["y_" + y_lang]:
+                    y_val = "y" + str(count) + "_" + y_lang
+                    tbl_res["tbl_columns"][y_val] = c_y
+                    count += 1
+
+        else:
+            tbl_res["tbl_columns"] = {
+                "x_en": self.p_x,
+                "x_bm": self.p_x,
+            }
+
+            count = 1
+            for c_y in self.p_y:
+                for y_lang in ["en", "bm"]:
+                    y_val = "y" + str(count) + "_" + y_lang
+                    tbl_res["tbl_columns"][y_val] = c_y
+                count += 1
 
         if len(self.p_keys) > 0:
             df["u_groups"] = list(df[self.p_keys].itertuples(index=False, name=None))
