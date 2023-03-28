@@ -24,7 +24,7 @@ class Pyramid(GeneralChartsUtil):
     p_y = []
 
     """
-    Initiailize the neccessary data for a bar chart
+    Initiailize the necessary data for a bar chart
     """
 
     def __init__(
