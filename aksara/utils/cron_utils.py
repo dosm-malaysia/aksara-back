@@ -1,25 +1,20 @@
+import json
 import os
+import shutil
+import zipfile
 from os import listdir
 from os.path import isfile, join
-from aksara.models import MetaJson, DashboardJson
-from aksara.utils import triggers
-from aksara.utils import data_utils
-from aksara.utils import common
-from aksara.catalog_utils import catalog_builder
-
-from aksara.api_handling import cache_search
-
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
-from aksara.models import CatalogJson, MetaJson, DashboardJson
-from django.apps import apps
 
 import requests
-import zipfile
-import json
-import shutil
+from django.apps import apps
+from django.conf import settings
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+
+from aksara.api_handling import cache_search
+from aksara.catalog_utils import catalog_builder
+from aksara.models import CatalogJson, DashboardJson, MetaJson
+from aksara.utils import common, data_utils, triggers
 
 """
 Creates a directory

@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('aksara', '0003_catalogjson_file_src'),
+        ("aksara", "0003_catalogjson_file_src"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='catalogjson',
-            name='catalog_category_name',
-            field=models.CharField(default='', max_length=600),
+            model_name="catalogjson",
+            name="catalog_category_name",
+            field=models.CharField(default="", max_length=600),
         ),
         migrations.AddField(
-            model_name='catalogjson',
-            name='catalog_subcategory',
-            field=models.CharField(default='', max_length=300),
+            model_name="catalogjson",
+            name="catalog_subcategory",
+            field=models.CharField(default="", max_length=300),
         ),
         migrations.AddField(
-            model_name='catalogjson',
-            name='catalog_subcategory_name',
-            field=models.CharField(default='', max_length=600),
+            model_name="catalogjson",
+            name="catalog_subcategory_name",
+            field=models.CharField(default="", max_length=600),
         ),
     ]

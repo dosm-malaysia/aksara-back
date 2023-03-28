@@ -1,10 +1,11 @@
-from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
-
-import pandas as pd
-import numpy as np
 import json
+
+import numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
+
+from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
 
 
 class Bar(GeneralChartsUtil):
@@ -23,7 +24,7 @@ class Bar(GeneralChartsUtil):
     b_y = []
 
     """
-    Initiailize the neccessary data for a bar chart
+    Initiailize the necessary data for a bar chart
     """
 
     def __init__(

@@ -1,8 +1,9 @@
 import os
 from os import listdir
 from os.path import isfile, join
-import requests
+
 import environ
+import requests
 
 env = environ.Env()
 environ.Env.read_env()

@@ -1,15 +1,14 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from aksara.utils import cron_utils
-from aksara.catalog_utils import catalog_builder
-
-from django.core.cache import cache
-
 import os
 import shutil
+
 import environ
+from django.conf import settings
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.core.management.base import BaseCommand, CommandError
+
+from aksara.catalog_utils import catalog_builder
+from aksara.utils import cron_utils
 
 env = environ.Env()
 environ.Env.read_env()

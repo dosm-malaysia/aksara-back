@@ -7,27 +7,42 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='KKMNowJSON',
+            name="KKMNowJSON",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('dashboard_name', models.CharField(max_length=200)),
-                ('chart_name', models.CharField(max_length=200, null=True)),
-                ('chart_type', models.CharField(max_length=200, null=True)),
-                ('api_type', models.CharField(max_length=200, null=True)),
-                ('chart_data', models.JSONField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("dashboard_name", models.CharField(max_length=200)),
+                ("chart_name", models.CharField(max_length=200, null=True)),
+                ("chart_type", models.CharField(max_length=200, null=True)),
+                ("api_type", models.CharField(max_length=200, null=True)),
+                ("chart_data", models.JSONField()),
             ],
         ),
         migrations.CreateModel(
-            name='MetaJson',
+            name="MetaJson",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('dashboard_name', models.CharField(max_length=200)),
-                ('dashboard_meta', models.JSONField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("dashboard_name", models.CharField(max_length=200)),
+                ("dashboard_meta", models.JSONField()),
             ],
-        ),        
+        ),
     ]

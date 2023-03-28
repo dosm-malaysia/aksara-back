@@ -10,13 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-import os
-from django.core.management.utils import get_random_secret_key
-from pathlib import Path
-import environ
-from urllib.parse import urlparse
-import dj_database_url
 import mimetypes
+import os
+from pathlib import Path
+from urllib.parse import urlparse
+
+import dj_database_url
+import environ
+from django.core.management.utils import get_random_secret_key
 
 mimetypes.add_type("text/css", ".css", True)
 env = environ.Env()

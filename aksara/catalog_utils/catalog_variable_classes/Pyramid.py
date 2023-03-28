@@ -1,10 +1,11 @@
-from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
-
-import pandas as pd
-import numpy as np
 import json
+
+import numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
+
+from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
 
 
 class Pyramid(GeneralChartsUtil):

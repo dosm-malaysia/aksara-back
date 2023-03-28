@@ -1,6 +1,7 @@
-from aksara.utils.general_chart_helpers import *
-from aksara.utils.chart_builder import *
 import os
+
+from aksara.utils.chart_builder import *
+from aksara.utils.general_chart_helpers import *
 
 """
 Segregates chart types,

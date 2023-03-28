@@ -1,16 +1,14 @@
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
-from aksara.models import MetaJson, DashboardJson
-from aksara.utils import dashboard_builder
-from aksara.utils import triggers
-from aksara.utils import common
-
+import json
 import os
 from os import listdir
 from os.path import isfile, join
-import json
+
+from django.conf import settings
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+
+from aksara.models import DashboardJson, MetaJson
+from aksara.utils import common, dashboard_builder, triggers
 
 """
 Operations to rebuild all meta, from each dashboard
@@ -119,7 +117,7 @@ def rebuild_dashboard_charts(operation, op_method):
                 res["data"] = dashboard_builder.build_chart(
                     chart_list[k]["chart_type"], c_data
                 )
-                if len(res["data"]) > 0:  # If the dict isnt empty
+                # if len(res["data"]) > 0:  # If the dict isn't empty
 
                     if "data_as_of" in chart_list[k]:
                         res["data_as_of"] = chart_list[k]["data_as_of"]

@@ -1,24 +1,22 @@
-from django.core.cache import cache
+import os
+import pathlib
+from os import listdir
+from os.path import isfile, join
+
 from django.conf import settings
+from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from aksara.catalog_utils import general_helper as gh
-from aksara.catalog_utils.catalog_variable_classes import Timeseries as tm
-from aksara.catalog_utils.catalog_variable_classes import Choropleth as ch
-from aksara.catalog_utils.catalog_variable_classes import Table as tb
-from aksara.catalog_utils.catalog_variable_classes import Geojson as gj
 from aksara.catalog_utils.catalog_variable_classes import Bar as bar
+from aksara.catalog_utils.catalog_variable_classes import Choropleth as ch
+from aksara.catalog_utils.catalog_variable_classes import Geojson as gj
 from aksara.catalog_utils.catalog_variable_classes import Heatmap as hm
 from aksara.catalog_utils.catalog_variable_classes import Pyramid as py
-
-
-from aksara.utils import cron_utils, data_utils, triggers
+from aksara.catalog_utils.catalog_variable_classes import Table as tb
+from aksara.catalog_utils.catalog_variable_classes import Timeseries as tm
 from aksara.models import CatalogJson
-
-import os
-from os import listdir
-from os.path import isfile, join
-import pathlib
+from aksara.utils import cron_utils, data_utils, triggers
 
 
 def catalog_update(operation, op_method):

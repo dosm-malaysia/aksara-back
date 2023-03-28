@@ -1,9 +1,10 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+from dateutil.relativedelta import relativedelta
 from mergedeep import merge
+
 from aksara.utils.general_chart_helpers import *
 from aksara.utils.operations import *
-from dateutil.relativedelta import relativedelta
 from aksara.utils.variable_structures import *
 
 """
@@ -617,7 +618,7 @@ def timeseries_shared(file_name: str, variables):
         for grp in u_groups_list:
             temp_df = grouped_df.get_group(grp)
             val_res = {}
-            for k,v in attributes.items():
+            for k, v in attributes.items():
                 val_res[k] = temp_df[v].to_list()
 
             result = val_res
