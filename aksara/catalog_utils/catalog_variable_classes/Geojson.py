@@ -9,16 +9,12 @@ from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsU
 
 
 class Geojson(GeneralChartsUtil):
-    """Geojson Class for Geojson variables"""
+    """Geojson Class for Geojson variables."""
 
     chart_type = "GEOJSON"
 
     c_color = ""
     c_file_json = ""
-
-    """
-    Initiailize the necessary data for a table chart
-    """
 
     def __init__(
         self,
@@ -29,6 +25,7 @@ class Geojson(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a table chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,

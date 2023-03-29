@@ -9,7 +9,7 @@ from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsU
 
 
 class Timeseries(GeneralChartsUtil):
-    """Timeseries Class for timeseries variables"""
+    """Timeseries Class for timeseries variables."""
 
     chart_type = "TIMESERIES"
 
@@ -38,10 +38,6 @@ class Timeseries(GeneralChartsUtil):
     t_operation = ""
     t_format = ""
 
-    """
-    Initiailize the necessary data for a timeseries chart
-    """
-
     def __init__(
         self,
         full_meta,
@@ -51,6 +47,7 @@ class Timeseries(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a timeseries chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,

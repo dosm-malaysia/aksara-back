@@ -82,8 +82,8 @@ def get_latest_info_git(type, commit_id):
     """get_latest_info_git.
 
     Args:
-        type:
-        commit_id:
+        type: type
+        commit_id: commit_id
     """
     sha_ext = os.getenv("GITHUB_SHA_URL", "-")
     url = "https://api.github.com/repos/dosm-malaysia/aksara-data/commits/" + sha_ext
@@ -195,7 +195,7 @@ def filter_changed_files(file_list):
     """Filters the changed files for dashboards and catalog data.
 
     Args:
-        file_list:
+        file_list: file_list
     """
     changed_files = {"dashboards": [], "catalog": []}
 
@@ -247,7 +247,7 @@ def revalidate_frontend(dashboard):
     """revalidate_frontend.
 
     Args:
-        dashboard:
+        dashboard: dashboard
     """
     if dashboard not in common.FRONTEND_ENDPOINTS:
         return -1

@@ -9,7 +9,7 @@ from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsU
 
 
 class Pyramid(GeneralChartsUtil):
-    """Pyramid Class for timeseries variables"""
+    """Pyramid Class for timeseries variables."""
 
     chart_type = "PYRAMID"
 
@@ -23,9 +23,7 @@ class Pyramid(GeneralChartsUtil):
     p_x = ""
     p_y = []
 
-    """
-    Initiailize the necessary data for a bar chart
-    """
+    """Initiailize the necessary data for a bar chart."""
 
     def __init__(
         self,

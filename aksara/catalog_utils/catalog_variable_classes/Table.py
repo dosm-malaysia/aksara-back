@@ -9,17 +9,13 @@ from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsU
 
 
 class Table(GeneralChartsUtil):
-    """Table Class for table variables"""
+    """Table Class for table variables."""
 
     chart_type = "TABLE"
 
     # Table Variables
     exclude = []
     freeze = []
-
-    """
-    Initiailize the necessary data for a table chart
-    """
 
     def __init__(
         self,
@@ -30,6 +26,7 @@ class Table(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a table chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,

@@ -10,7 +10,7 @@ from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsU
 
 
 class Heatmap(GeneralChartsUtil):
-    """Heatmap Class for timeseries variables"""
+    """Heatmap Class for timeseries variables."""
 
     chart_type = "HEATMAP"
 
@@ -23,10 +23,6 @@ class Heatmap(GeneralChartsUtil):
     h_id = ""
     h_cols = []
 
-    """
-    Initiailize the necessary data for a bar chart
-    """
-
     def __init__(
         self,
         full_meta,
@@ -36,6 +32,7 @@ class Heatmap(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a bar chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,

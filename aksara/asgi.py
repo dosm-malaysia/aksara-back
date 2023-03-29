@@ -1,5 +1,4 @@
-"""
-ASGI config for aksara project.
+"""ASGI config for aksara project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
