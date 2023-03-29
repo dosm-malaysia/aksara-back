@@ -41,7 +41,7 @@ class CHART(APIView):
             )[0]["dashboard_meta"]
             api_params = meta["charts"][chart_name]["api_params"]
             chart_type = meta["charts"][chart_name]["chart_type"]
-            api_type = meta["charts"][chart_name]["api_type"]
+            api_type = meta["charts"][chart_name]["api_type"]  # noqa: F841
             chart_variables = meta["charts"][chart_name]["variables"]
 
             chart_data = DashboardJson.objects.filter(

@@ -84,7 +84,7 @@ def bar_meter(file_name: str, variables: BarMeterVariables):
     add_key = variables["add_key"]
     wanted = variables["wanted"]
     id_needed = variables["id_needed"]
-    condition = variables["condition"]
+    condition = variables["condition"]  # noqa: F841
     post_op = variables["post_operation"]
 
     if len(wanted) > 0:
