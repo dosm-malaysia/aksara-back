@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## Setup DB
 
-1. Setup a DB server (PostgresSQL DB recommended) and populate your DB instance settings in the `.env` file.
+1. Setup a DB server (postgresql DB recommended) and populate your DB instance settings in the `.env` file.
 2. Run migrations to setup all tables: `python manage.py migrate`
 3. Fetch data from `dosm-malaysia/aksara-data` repo and populate or update the DB: `python manage.py loader UPDATE`
 4. To rebuild the DB from scratch: `python manage.py loader REBUILD`
@@ -94,7 +94,7 @@ A META Json contains all information required to build a dashboard. These files 
 
 ## Catalog Jsons
     Catalog Json version 1.0
-A Catalog Json contains all information required to build a data variable, or a set of data-variables. These files can be found within the `catalog` forlder of the `aksara-data` repo. Each one is responsible for 1 or more data variables.
+A Catalog Json contains all information required to build a data variable, or a set of data-variables. These files can be found within the `catalog` folder of the `aksara-data` repo. Each one is responsible for 1 or more data variables.
 - Each Catalog Json contains information regarding the chart type of the variable, the explanations of the variables, as well as the file source of the data.
 - The Catalog JSON can be divided into 2 essential parts :
     - File

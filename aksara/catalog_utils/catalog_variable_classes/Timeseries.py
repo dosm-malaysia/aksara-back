@@ -1,14 +1,15 @@
-from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
-
-import pandas as pd
-import numpy as np
 import json
+
+import numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
 
+from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
+
 
 class Timeseries(GeneralChartsUtil):
-    """Timeseries Class for timeseries variables"""
+    """Timeseries Class for timeseries variables."""
 
     chart_type = "TIMESERIES"
 
@@ -37,10 +38,6 @@ class Timeseries(GeneralChartsUtil):
     t_operation = ""
     t_format = ""
 
-    """
-    Initiailize the neccessary data for a timeseries chart
-    """
-
     def __init__(
         self,
         full_meta,
@@ -50,6 +47,7 @@ class Timeseries(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a timeseries chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,

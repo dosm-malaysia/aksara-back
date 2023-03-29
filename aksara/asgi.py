@@ -1,5 +1,4 @@
-"""
-ASGI config for aksara project.
+"""ASGI config for aksara project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +10,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aksara.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aksara.settings")
 
 application = get_asgi_application()

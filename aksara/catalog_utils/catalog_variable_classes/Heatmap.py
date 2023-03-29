@@ -1,15 +1,16 @@
-from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
-
-import pandas as pd
-import numpy as np
 import json
+import re
+
+import numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
-import re
+
+from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
 
 
 class Heatmap(GeneralChartsUtil):
-    """Heatmap Class for timeseries variables"""
+    """Heatmap Class for timeseries variables."""
 
     chart_type = "HEATMAP"
 
@@ -22,10 +23,6 @@ class Heatmap(GeneralChartsUtil):
     h_id = ""
     h_cols = []
 
-    """
-    Initiailize the neccessary data for a bar chart
-    """
-
     def __init__(
         self,
         full_meta,
@@ -35,6 +32,7 @@ class Heatmap(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a bar chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,

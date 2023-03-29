@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('aksara', '0004_catalogjson_catalog_category_name_and_more'),
+        ("aksara", "0004_catalogjson_catalog_category_name_and_more"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='KKMNowJSON',
-            new_name='DashboardJson',
+            old_name="KKMNowJSON",
+            new_name="DashboardJson",
         ),
     ]

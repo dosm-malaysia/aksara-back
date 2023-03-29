@@ -1,14 +1,15 @@
-from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
-
-import pandas as pd
-import numpy as np
 import json
+
+import numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
 
+from aksara.catalog_utils.catalog_variable_classes.General import GeneralChartsUtil
+
 
 class Choropleth(GeneralChartsUtil):
-    """Choropleth Class for choropleth variables"""
+    """Choropleth Class for choropleth variables."""
 
     chart_type = "CHOROPLETH"
 
@@ -21,10 +22,6 @@ class Choropleth(GeneralChartsUtil):
     c_color = ""
     c_file_json = ""
 
-    """
-    Initiailize the neccessary data for a Choropleth chart
-    """
-
     def __init__(
         self,
         full_meta,
@@ -34,6 +31,7 @@ class Choropleth(GeneralChartsUtil):
         all_variable_data,
         file_src,
     ):
+        """Initiailize the necessary data for a Choropleth chart."""
         GeneralChartsUtil.__init__(
             self,
             full_meta,
@@ -67,11 +65,8 @@ class Choropleth(GeneralChartsUtil):
         self.chart_details["chart"] = self.build_chart()
         self.db_input["catalog_data"] = self.build_catalog_data_info()
 
-    """
-    Build the Choropleth chart
-    """
-
     def build_chart(self):
+        """Build the Choropleth chart."""
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
         res = {}
@@ -140,11 +135,8 @@ class Choropleth(GeneralChartsUtil):
 
         return res
 
-    """
-    Builds the API info for Choropleth
-    """
-
     def build_api_info(self):
+        """Builds the API info for Choropleth."""
         res = {}
 
         res["API"] = {}
@@ -174,6 +166,7 @@ class Choropleth(GeneralChartsUtil):
         return res["API"]
 
     def validate_meta_json(self):
+        """validate_meta_json."""
         src = self.variable_name
 
         self.validate_field_presence(

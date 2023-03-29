@@ -1,25 +1,23 @@
-from django.http import JsonResponse
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from functools import reduce
-from django.db.models import Q
-
-from aksara.utils import cron_utils, triggers
-from aksara.serializers import MetaSerializer, DashboardSerializer, CatalogSerializer
-from aksara.models import MetaJson, DashboardJson, CatalogJson
-from aksara.api_handling import handle, cache_search
-
-from threading import Thread
-
 import json
 import os
+from functools import reduce
+from threading import Thread
+
 import environ
+from django.conf import settings
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.db.models import Q
+from django.http import JsonResponse
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from aksara.api_handling import cache_search, handle
+from aksara.models import CatalogJson, DashboardJson, MetaJson
+from aksara.serializers import CatalogSerializer, DashboardSerializer, MetaSerializer
+from aksara.utils import cron_utils, triggers
 
 env = environ.Env()
 environ.Env.read_env()
@@ -43,7 +41,7 @@ class CHART(APIView):
             )[0]["dashboard_meta"]
             api_params = meta["charts"][chart_name]["api_params"]
             chart_type = meta["charts"][chart_name]["chart_type"]
-            api_type = meta["charts"][chart_name]["api_type"]
+            api_type = meta["charts"][chart_name]["api_type"]  # noqa: F841
             chart_variables = meta["charts"][chart_name]["variables"]
 
             chart_data = DashboardJson.objects.filter(

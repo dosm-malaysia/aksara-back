@@ -1,44 +1,32 @@
+import json
 import os
+import shutil
+import zipfile
 from os import listdir
 from os.path import isfile, join
-from aksara.models import MetaJson, DashboardJson
-from aksara.utils import triggers
-from aksara.utils import data_utils
-from aksara.utils import common
-from aksara.catalog_utils import catalog_builder
-
-from aksara.api_handling import cache_search
-
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
-from aksara.models import CatalogJson, MetaJson, DashboardJson
-from django.apps import apps
 
 import requests
-import zipfile
-import json
-import shutil
+from django.apps import apps
+from django.conf import settings
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
-"""
-Creates a directory
-"""
+from aksara.api_handling import cache_search
+from aksara.catalog_utils import catalog_builder
+from aksara.models import CatalogJson, DashboardJson, MetaJson
+from aksara.utils import common, data_utils, triggers
 
 
 def create_directory(dir_name):
+    """Creates a directory."""
     try:
         os.mkdir(os.path.join(os.getcwd(), dir_name))
-    except OSError as error:
-        print("Directory already exists, no need to create")
-
-
-"""
-Fetches entire content from a git repo
-"""
+    except OSError as e:
+        print(f"Directory already exists, no need to create: {e}")
 
 
 def fetch_from_git(zip_name, git_url, git_token):
+    """Fetches entire content from a git repo."""
     file_name = os.path.join(os.getcwd(), zip_name)
     headers = {
         "Authorization": f"token {git_token}",
@@ -52,39 +40,26 @@ def fetch_from_git(zip_name, git_url, git_token):
     return res
 
 
-"""
-Writes content as binary
-"""
-
-
 def write_as_binary(file_name, data):
+    """Writes content as binary."""
     try:
         with open(file_name, "wb") as f:
             f.write(data.content)
-    except:
-        triggers.send_telegram("!! FILE ISSUES WRITING TO BINARY !!")
-
-
-"""
-Extracts zip file into desired directory
-"""
+    except Exception as e:
+        triggers.send_telegram(f"!! FILE ISSUES WRITING TO BINARY: {e} !!")
 
 
 def extract_zip(file_name, dir_name):
+    """Extracts zip file into desired directory."""
     try:
         with zipfile.ZipFile(file_name, "r") as zip_ref:
             zip_ref.extractall(os.path.join(os.getcwd(), dir_name))
-    except:
-        triggers.send_telegram("!! ZIP FILE EXTRACTION ISSUE !!")
-
-
-"""
-Performs data operations,
-such as update or rebuild
-"""
+    except Exception as e:
+        triggers.send_telegram(f"!! ZIP FILE EXTRACTION ISSUE: {e} !!")
 
 
 def data_operation(operation, op_method):
+    """Performs data operations, such as update or rebuild."""
     dir_name = "AKSARA_SRC"
     zip_name = "repo.zip"
     git_url = os.getenv("GITHUB_URL", "-")
@@ -104,6 +79,12 @@ def data_operation(operation, op_method):
 
 
 def get_latest_info_git(type, commit_id):
+    """get_latest_info_git.
+
+    Args:
+        type: type
+        commit_id: commit_id
+    """
     sha_ext = os.getenv("GITHUB_SHA_URL", "-")
     url = "https://api.github.com/repos/dosm-malaysia/aksara-data/commits/" + sha_ext
     headers_accept = "application/vnd.github.VERSION.sha"
@@ -126,6 +107,7 @@ def get_latest_info_git(type, commit_id):
 
 
 def selective_update():
+    """selective_update."""
     # Delete all file src
     # os.remove("repo.zip")
     # shutil.rmtree("AKSARA_SRC/")
@@ -209,12 +191,12 @@ def selective_update():
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 
-"""
-Filters the changed files for dashboards and catalog data
-"""
-
-
 def filter_changed_files(file_list):
+    """Filters the changed files for dashboards and catalog data.
+
+    Args:
+        file_list: file_list
+    """
     changed_files = {"dashboards": [], "catalog": []}
 
     for f in file_list:
@@ -226,12 +208,8 @@ def filter_changed_files(file_list):
     return changed_files
 
 
-"""
-Remove deleted files
-"""
-
-
 def remove_deleted_files():
+    """remove_deleted_files."""
     for k, v in common.REFRESH_VARIABLES.items():
         model_name = apps.get_model("aksara", k)
         distinct_db = [
@@ -265,12 +243,12 @@ def remove_deleted_files():
     cache.set("catalog_list", catalog_list)
 
 
-"""
-Revalidate Frontend
-"""
-
-
 def revalidate_frontend(dashboard):
+    """revalidate_frontend.
+
+    Args:
+        dashboard: dashboard
+    """
     if dashboard not in common.FRONTEND_ENDPOINTS:
         return -1
 
@@ -286,12 +264,8 @@ def revalidate_frontend(dashboard):
     return response.status_code
 
 
-"""
-Set Source Filters Cache
-"""
-
-
 def source_filters_cache():
+    """Set Source Filters Cache."""
     filter_sources_distinct = CatalogJson.objects.values("data_source").distinct()
     source_filters = set()
 
@@ -308,12 +282,8 @@ def source_filters_cache():
     return list(source_filters)
 
 
-"""
-REMOVE SRC FOLDERS
-"""
-
-
 def remove_src_folders():
+    """remove_src_folders."""
     if os.path.exists("AKSARA_SRC") and os.path.isdir("AKSARA_SRC"):
         shutil.rmtree("AKSARA_SRC")
     if os.path.exists("repo.zip"):
